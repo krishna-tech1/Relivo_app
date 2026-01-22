@@ -1,7 +1,11 @@
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 
-load_dotenv()
+# Explicitly load .env from the backend root directory
+# app/core/config.py -> app/core -> app -> refugee_app_backend
+env_path = Path(__file__).resolve().parent.parent.parent / ".env"
+load_dotenv(dotenv_path=env_path)
 
 class Settings:
     PROJECT_NAME: str = "Refugee App Backend"

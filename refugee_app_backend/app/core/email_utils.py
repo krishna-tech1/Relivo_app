@@ -6,12 +6,23 @@ import os
 
 # Configuration for FastAPI Mail
 # In a real scenario, these values come from .env
+username = os.getenv("MAIL_USERNAME", "apikey")
+password = os.getenv("MAIL_PASSWORD", "")
+server = os.getenv("MAIL_SERVER", "smtp-relay.brevo.com")
+port = int(os.getenv("MAIL_PORT", 587))
+sender = os.getenv("MAIL_FROM", "no-reply@relivo-app.com")
+
+print(f"DEBUG: Email Config - Server: {server}:{port}")
+print(f"DEBUG: Email Config - User: {username}")
+print(f"DEBUG: Email Config - From: {sender}")
+print(f"DEBUG: Email Config - Password set: {'Yes' if password else 'No'}")
+
 conf = ConnectionConfig(
-    MAIL_USERNAME=os.getenv("MAIL_USERNAME", "your_email@gmail.com"),
-    MAIL_PASSWORD=os.getenv("MAIL_PASSWORD", "your_app_password"),
-    MAIL_FROM=os.getenv("MAIL_FROM", "your_email@gmail.com"),
-    MAIL_PORT=int(os.getenv("MAIL_PORT", 587)),
-    MAIL_SERVER=os.getenv("MAIL_SERVER", "smtp.gmail.com"),
+    MAIL_USERNAME=username,
+    MAIL_PASSWORD=password,
+    MAIL_FROM=sender,
+    MAIL_PORT=port,
+    MAIL_SERVER=server,
     MAIL_STARTTLS=True,
     MAIL_SSL_TLS=False,
     USE_CREDENTIALS=True,
@@ -21,8 +32,9 @@ conf = ConnectionConfig(
 async def send_verification_email(email_to: EmailStr, code: str):
     """
     Sends a verification email with the OTP code.
-    If credentials are invalid, it will log an error but not crash the app (for dev safety).
     """
+    print(f"Attempting to send email to {email_to} via {conf.MAIL_SERVER}...")
+    
     html = f"""
     <html>
         <body>
@@ -46,9 +58,9 @@ async def send_verification_email(email_to: EmailStr, code: str):
     fm = FastMail(conf)
     try:
         await fm.send_message(message)
-        print(f"✅ Email sent to {email_to}")
+        print(f"✅ Email sent successfully to {email_to}")
         return True
     except Exception as e:
-        print(f"⚠️ Failed to send email: {e}")
-        print("💡 Hint: update .env with valid MAIL_USERNAME and MAIL_PASSWORD")
+        print(f"❌ Failed to send email: {e}")
+        print(f"DEBUGGING INFO: Server={conf.MAIL_SERVER} Port={conf.MAIL_PORT} User={conf.MAIL_USERNAME}")
         return False
