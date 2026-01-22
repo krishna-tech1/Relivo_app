@@ -1,0 +1,27 @@
+Starting a Gradle Daemon, 3 incompatible Daemons could not be reused, use --status for details
+> Task :gradle:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :gradle:compileKotlin UP-TO-DATE
+> Task :gradle:compileJava NO-SOURCE
+> Task :gradle:compileGroovy NO-SOURCE
+> Task :gradle:pluginDescriptors UP-TO-DATE
+> Task :gradle:processResources
+> Task :gradle:classes
+> Task :gradle:jar
+
+FAILURE: Build failed with an exception.
+
+* Where:
+Build file 'C:\Users\iammu\OneDrive\Desktop\Documents\krishna file\refugee_app\android\build.gradle.kts' line: 28
+
+* What went wrong:
+A problem occurred configuring project ':app'.
+> file:///C:/Users/iammu/OneDrive/Desktop/Documents/krishna%20file/refugee_app/android/app/build.gradle.kts:4:1: Unexpected `plugins` block found. Only one `plugins` block is allowed per script.
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 10s
+4 actionable tasks: 2 executed, 2 up-to-date
