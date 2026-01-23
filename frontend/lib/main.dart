@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'auth/auth_wrapper.dart';
+import 'screens/splash_screen.dart';
 import 'theme/app_theme.dart';
 
 void main() {
@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
       title: 'Refugee App',
       theme: AppTheme.lightTheme,
       debugShowCheckedModeBanner: false,
-      home: const AuthWrapper(),
+      home: const SplashScreen(),
     );
   }
 }

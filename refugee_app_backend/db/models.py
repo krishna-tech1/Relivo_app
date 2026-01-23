@@ -23,3 +23,16 @@ class VerificationCode(Base):
     code = Column(String, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
+
+class Grant(Base):
+    __tablename__ = "grants"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, index=True, nullable=False)
+    provider = Column(String, nullable=False)
+    description = Column(String)
+    amount = Column(String) # Storing as string to accommodate currency symbols etc for now.
+    deadline = Column(DateTime)
+    location = Column(String)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())

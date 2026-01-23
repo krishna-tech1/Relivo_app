@@ -20,6 +20,8 @@ app.add_middleware(
 # Base.metadata.create_all(bind=engine)  <-- REMOVED TO PREVENT CRASH
 
 app.include_router(auth.router)
+from app.api import grants
+app.include_router(grants.router)
 
 @app.get("/")
 async def root():

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:refugee_app/widgets/custom_button.dart';
 import 'package:refugee_app/widgets/custom_text_field.dart';
+import 'package:refugee_app/services/auth_services.dart';
+import 'package:refugee_app/screens/admin_dashboard_screen.dart';
 
 class AdminLoginScreen extends StatefulWidget {
   const AdminLoginScreen({super.key});
@@ -13,13 +15,53 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final bool _isLoading = false;
+  bool _isLoading = false;
 
   void _handleLogin() async {
     if (_formKey.currentState!.validate()) {
-      // Mock admin login success
-      if (mounted) {
-        Navigator.pushReplacementNamed(context, '/admin-dashboard');
+      setState(() => _isLoading = true);
+
+      try {
+        final authService = AuthService();
+        // Login
+        await authService.login(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        );
+
+        // Verify Admin Role
+        final user = await authService.getCurrentUser();
+        
+        if (mounted) {
+          if (user['role'] == 'admin') {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const AdminDashboardScreen()),
+            );
+          } else {
+            // Not an admin
+            await authService.logout();
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Access Denied: This account does not have admin privileges.'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Login Failed: ${e.toString()}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } finally {
+        if (mounted) {
+          setState(() => _isLoading = false);
+        }
       }
     }
   }

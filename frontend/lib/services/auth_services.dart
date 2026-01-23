@@ -163,6 +163,25 @@ class AuthService {
     await prefs.remove('jwt_token');
   }
 
+  Future<Map<String, dynamic>> getCurrentUser() async {
+    final token = await getToken();
+    if (token == null) throw Exception("No token found");
+
+    final response = await http.get(
+      Uri.parse("$baseUrl/auth/me"),
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token",
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception("Failed to fetch user");
+    }
+  }
+
   Future<bool> isLoggedIn() async {
     final token = await getToken();
     return token != null;
