@@ -2,7 +2,7 @@ import requests
 import json
 from app.core.config import settings
 
-def send_verification_email(email_to: str, code: str):
+def send_verification_email(email_to: str, code: str, subject: str = "Your Verification Code - Relivo", heading: str = "Verification Code"):
     print(f"DEBUG: Attempting to send email via Brevo API to {email_to}")
     
     url = "https://api.brevo.com/v3/smtp/email"
@@ -29,13 +29,13 @@ def send_verification_email(email_to: str, code: str):
                 "email": email_to
             }
         ],
-        "subject": "Your Verification Code - Relivo",
+        "subject": subject,
         "htmlContent": f"""
         <html>
             <body style="font-family: Arial, sans-serif;">
                 <div style="padding: 20px; background-color: #f4f4f4; border-radius: 10px;">
-                    <h2 style="color: #333;">Verification Code</h2>
-                    <p style="font-size: 16px;">Your verification code is:</p>
+                    <h2 style="color: #333;">{heading}</h2>
+                    <p style="font-size: 16px;">Your code is:</p>
                     <h1 style="color: #4CAF50; letter-spacing: 5px;">{code}</h1>
                     <p style="font-size: 14px; color: #666;">Please do not share this code with anyone.</p>
                 </div>

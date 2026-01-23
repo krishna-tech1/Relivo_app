@@ -68,7 +68,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           // Show error message
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Registration failed: ${e.toString()}'),
+              content: Text('${e.toString().replaceAll("Exception: ", "")}'),
               backgroundColor: Colors.red,
             ),
           );

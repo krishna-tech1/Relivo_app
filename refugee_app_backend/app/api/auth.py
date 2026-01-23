@@ -140,14 +140,16 @@ def login(user_in: schemas.UserLogin, db: Session = Depends(get_db)):
     
     if not user:
         print("DEBUG: Login failed - User not found in DB")
-        raise HTTPException(status_code=401, detail="Incorrect email or password")
+        # USER REQUEST: Explicitly say email not registered
+        raise HTTPException(status_code=404, detail="Email not registered")
         
     keyword_match = security.verify_password(user_in.password, user.hashed_password)
     print(f"DEBUG: Password match result: {keyword_match}")
     
     if not keyword_match:
         print("DEBUG: Login failed - Password mismatch")
-        raise HTTPException(status_code=401, detail="Incorrect email or password")
+        # USER REQUEST: Explicitly say incorrect password
+        raise HTTPException(status_code=401, detail="Incorrect password")
     
     print(f"DEBUG: User Verified Status: {user.is_verified}")
     if not user.is_verified:
@@ -161,6 +163,73 @@ def login(user_in: schemas.UserLogin, db: Session = Depends(get_db)):
     )
     print("DEBUG: Login successful, generating token")
     return {"access_token": access_token, "token_type": "bearer"}
+
+@router.post("/forgot-password")
+def forgot_password(
+    data: EmailSchema,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db)
+):
+    """
+    Send an OTP to the user's email for password reset.
+    """
+    user = db.query(models.User).filter(models.User.email == data.email).first()
+    if not user:
+        # For security, standard practice is to not reveal if email exists, 
+        # BUT the user explicitly requested "shows the cause", so we will return 404 if not found for better UX as requested.
+        raise HTTPException(status_code=404, detail="Email not registered")
+
+    # Remove old codes
+    db.query(models.VerificationCode).filter(models.VerificationCode.email == data.email).delete()
+    
+    # Create new code
+    code = generate_verification_code()
+    db_code = models.VerificationCode(email=data.email, code=code)
+    db.add(db_code)
+    db.commit()
+    
+    # Send email
+    subject = "Reset Your Password - Relivo"
+    heading = "Password Reset Code"
+    background_tasks.add_task(send_verification_email, data.email, code, subject, heading)
+    print(f"\nExample App: Forgot Password Code for {data.email} is: ===> {code} <===\n")
+    
+    return {"message": "Password reset OTP sent"}
+
+@router.post("/reset-password")
+def reset_password(
+    data: schemas.PasswordResetConfirm,
+    db: Session = Depends(get_db)
+):
+    """
+    Verify OTP and reset password.
+    """
+    # Verify code
+    db_code = db.query(models.VerificationCode).filter(
+        models.VerificationCode.email == data.email,
+        models.VerificationCode.code == data.code
+    ).first()
+    
+    if not db_code:
+        raise HTTPException(status_code=400, detail="Invalid or expired verification code")
+    
+    # Get User
+    user = db.query(models.User).filter(models.User.email == data.email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Reset Password
+    user.hashed_password = security.get_password_hash(data.new_password)
+    
+    # Also verify user if not already (since they proved ownership of email)
+    if not user.is_verified:
+        user.is_verified = True
+        
+    # Delete code
+    db.delete(db_code)
+    db.commit()
+    
+    return {"message": "Password reset successfully"}
 
 @router.get("/me", response_model=schemas.UserResponse)
 def read_users_me(current_user: models.User = Depends(deps.get_current_active_user)):

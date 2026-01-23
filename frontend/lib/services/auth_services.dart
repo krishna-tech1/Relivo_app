@@ -147,6 +147,52 @@ class AuthService {
     }
   }
 
+  // FORGOT PASSWORD
+  Future<void> forgotPassword(String email) async {
+    final response = await http.post(
+      Uri.parse("$baseUrl/auth/forgot-password"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        "email": email,
+      }),
+    );
+
+    if (response.statusCode != 200) {
+       try {
+        final error = jsonDecode(response.body);
+        throw Exception(error['detail'] ?? "Failed to send reset code");
+      } catch (e) {
+        throw Exception("Server Error (${response.statusCode})");
+      }
+    }
+  }
+
+  // RESET PASSWORD
+  Future<void> resetPassword({
+    required String email,
+    required String code,
+    required String newPassword,
+  }) async {
+    final response = await http.post(
+      Uri.parse("$baseUrl/auth/reset-password"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        "email": email,
+        "code": code,
+        "new_password": newPassword
+      }),
+    );
+
+    if (response.statusCode != 200) {
+      try {
+        final error = jsonDecode(response.body);
+        throw Exception(error['detail'] ?? "Password reset failed");
+      } catch (e) {
+        throw Exception("Server Error (${response.statusCode})");
+      }
+    }
+  }
+
   // TOKEN PERSISTENCE
   Future<void> saveToken(String token) async {
     final prefs = await SharedPreferences.getInstance();

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:refugee_app/screens/register_screen.dart';
 import 'package:refugee_app/screens/admin_login_screen.dart';
+import 'package:refugee_app/screens/forgot_password_screen.dart';
 import 'package:refugee_app/widgets/custom_button.dart';
 import 'package:refugee_app/widgets/custom_text_field.dart';
 import 'package:refugee_app/services/auth_services.dart';
@@ -55,7 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
           // Show error message
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Login failed: ${e.toString()}'),
+              content: Text('${e.toString().replaceAll("Exception: ", "")}'),
               backgroundColor: Colors.red,
             ),
           );
@@ -131,7 +132,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ForgotPasswordScreen(),
+                        ),
+                      );
+                    },
                     child: const Text('Forgot Password?'),
                   ),
                 ),
