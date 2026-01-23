@@ -75,6 +75,9 @@ class VerifyCodeSchema(BaseModel):
     email: EmailStr
     code: str
 
+class EmailSchema(BaseModel):
+    email: EmailStr
+
 @router.post("/verify")
 def verify_email_route(data: VerifyCodeSchema, db: Session = Depends(get_db)):
     db_code = db.query(models.VerificationCode).filter(
@@ -101,6 +104,34 @@ def verify_email_route(data: VerifyCodeSchema, db: Session = Depends(get_db)):
         return {"access_token": access_token, "token_type": "bearer"}
     
     raise HTTPException(status_code=404, detail="User not found")
+
+@router.post("/resend-code")
+def resend_code(
+    data: EmailSchema,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db)
+):
+    user = db.query(models.User).filter(models.User.email == data.email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+        
+    if user.is_verified:
+        raise HTTPException(status_code=400, detail="User already verified")
+        
+    # Remove old codes
+    db.query(models.VerificationCode).filter(models.VerificationCode.email == data.email).delete()
+    
+    # Create new code
+    code = generate_verification_code()
+    db_code = models.VerificationCode(email=data.email, code=code)
+    db.add(db_code)
+    db.commit()
+    
+    # Send email
+    background_tasks.add_task(send_verification_email, data.email, code)
+    print(f"\nExample App: Resend Code for {data.email} is: ===> {code} <===\n")
+    
+    return {"message": "Verification code resent"}
 
 @router.post("/login", response_model=schemas.Token)
 def login(user_in: schemas.UserLogin, db: Session = Depends(get_db)):

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:refugee_app/services/auth_services.dart';
 import 'package:refugee_app/widgets/custom_button.dart';
 import 'package:refugee_app/widgets/custom_text_field.dart';
+import 'login_screen.dart';
 import 'home_screen.dart';
 
 class VerifyEmailScreen extends StatefulWidget {
@@ -54,6 +55,29 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
     }
   }
 
+  Future<void> _handleResend() async {
+    setState(() => _isLoading = true);
+    try {
+      await _authService.resendCode(widget.email);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Verification code resent successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${e.toString()}')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
   @override
   void dispose() {
     _codeController.dispose();
@@ -67,7 +91,15 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
         title: const Text('Verify Email'),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: const BackButton(color: Colors.black),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const LoginScreen()),
+            );
+          },
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -117,12 +149,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
             ),
             const SizedBox(height: 24),
             TextButton(
-              onPressed: () {
-                // Future: implementation for resending code
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Resend code feature coming soon')),
-                );
-              },
+              onPressed: _isLoading ? null : _handleResend,
               child: const Text('Resend Code'),
             ),
           ],

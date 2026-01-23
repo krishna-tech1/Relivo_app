@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'auth_services.dart';
 
 class ApiService {
-  static const String baseUrl = "http://10.175.251.9:8000"; 
+  static const String baseUrl = "https://relivo-app.onrender.com"; 
   final AuthService _authService = AuthService();
 
   Future<Map<String, dynamic>> getMe() async {

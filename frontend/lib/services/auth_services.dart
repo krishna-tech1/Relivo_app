@@ -14,7 +14,7 @@ class AuthService {
   // static const String baseUrl = "http://10.0.2.2:8000";
 
   // OPTION 3: Physical Device - Use your PC's IP address (Run 'ipconfig' in cmd to find it)
-  static const String baseUrl = "http://10.208.104.20:8000"; // REPLACE WITH YOUR IP
+  static const String baseUrl = "https://relivo-app.onrender.com"; // Production Render URL
   // ---------------------------------------------------------------------------
 
   // REGISTER
@@ -87,6 +87,26 @@ class AuthService {
     }
   }
 
+  // RESEND CODE
+  Future<void> resendCode(String email) async {
+    final response = await http.post(
+      Uri.parse("$baseUrl/auth/resend-code"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        "email": email,
+      }),
+    );
+
+    if (response.statusCode != 200) {
+      try {
+        final error = jsonDecode(response.body);
+        throw Exception(error['detail'] ?? "Resend failed");
+      } catch (e) {
+        throw Exception("Server Error (${response.statusCode})");
+      }
+    }
+  }
+
   // LOGIN
   Future<Map<String, dynamic>> login({
     required String email,
@@ -98,7 +118,7 @@ class AuthService {
         Uri.parse("$baseUrl/auth/login"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
-          "username": email,
+          "email": email,
           "password": password,
         }),
       ).timeout(const Duration(seconds: 90));
