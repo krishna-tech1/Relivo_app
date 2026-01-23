@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../theme/app_theme.dart';
 import '../models/grant.dart';
 
@@ -266,13 +267,32 @@ class GrantDetailScreen extends StatelessWidget {
           ],
         ),
         child: ElevatedButton(
-          onPressed: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Application process will be implemented'),
-                backgroundColor: AppTheme.success,
-              ),
-            );
+          onPressed: () async {
+            if (grant.applyUrl.isEmpty) {
+               ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('No application link available')),
+              );
+              return;
+            }
+            
+            final Uri url = Uri.parse(grant.applyUrl);
+            try {
+              if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+                // If direct launch fails, try again (sometimes helps with checks)
+                // Or just show error
+                 if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Could not open link')),
+                    );
+                 }
+              }
+            } catch (e) {
+               if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Could not open link: $e')),
+                  );
+               }
+            }
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.transparent,

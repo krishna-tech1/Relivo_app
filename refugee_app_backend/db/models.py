@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, JSON
 from sqlalchemy.sql import func
 from .session import Base
 
@@ -34,5 +34,8 @@ class Grant(Base):
     amount = Column(String) # Storing as string to accommodate currency symbols etc for now.
     deadline = Column(DateTime)
     location = Column(String)
+    apply_url = Column(String, nullable=True)
+    eligibility_criteria = Column(JSON, nullable=True)
+    required_documents = Column(JSON, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())

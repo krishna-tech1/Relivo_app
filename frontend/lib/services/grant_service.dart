@@ -93,16 +93,21 @@ class GrantService {
     return Grant(
       id: json['id'].toString(),
       title: json['title'],
-      organizer: json['provider'], // Mapping 'provider' to 'organizer'
-      country: json['location'] ?? 'Unknown', // Mapping 'location' to 'country'
-      category: 'General', // Default, as backend doesn't store this yet
+      organizer: json['provider'],
+      country: json['location'] ?? 'Unknown',
+      category: 'General', 
       deadline: json['deadline'] != null ? DateTime.parse(json['deadline']) : DateTime.now().add(const Duration(days: 30)),
       amount: json['amount'] ?? '',
       description: json['description'] ?? '',
-      eligibilityCriteria: [], // Default empty as backend doesn't store this yet
-      requiredDocuments: [], // Default empty
-      isVerified: true, // Assuming admin created ones are verified
+      eligibilityCriteria: json['eligibility_criteria'] != null 
+          ? List<String>.from(json['eligibility_criteria']) 
+          : [],
+      requiredDocuments: json['required_documents'] != null 
+          ? List<String>.from(json['required_documents']) 
+          : [],
+      isVerified: true, 
       isUrgent: false,
+      applyUrl: json['apply_url'] ?? '',
     );
   }
 
@@ -114,7 +119,9 @@ class GrantService {
       'amount': grant.amount,
       'deadline': grant.deadline.toIso8601String(),
       'location': grant.country,
-      // Add other fields when backend supports them
+      'apply_url': grant.applyUrl,
+      'eligibility_criteria': grant.eligibilityCriteria,
+      'required_documents': grant.requiredDocuments,
     };
   }
 }

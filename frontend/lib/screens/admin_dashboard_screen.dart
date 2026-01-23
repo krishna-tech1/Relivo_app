@@ -5,6 +5,7 @@ import 'package:refugee_app/screens/admin_login_screen.dart';
 import 'package:refugee_app/services/auth_services.dart';
 import 'package:refugee_app/services/grant_service.dart';
 import 'package:intl/intl.dart';
+import 'package:refugee_app/screens/grant_editor_screen.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
@@ -53,42 +54,16 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     }
   }
 
-  Future<void> _showGrantDialog([Grant? grant]) async {
-    await showDialog(
-      context: context,
-      builder: (context) => _GrantEditor(
-        grant: grant, 
-        onSave: (newGrant) async {
-            try {
-              if (grant == null) {
-                // Create
-                await _grantService.createGrant(newGrant);
-              } else {
-                // Update - keep the same ID
-                 final updatedGrant = Grant(
-                    id: grant.id,
-                    title: newGrant.title,
-                    organizer: newGrant.organizer,
-                    country: newGrant.country,
-                    category: newGrant.category,
-                    deadline: newGrant.deadline,
-                    amount: newGrant.amount,
-                    description: newGrant.description,
-                    eligibilityCriteria: [],
-                    requiredDocuments: [],
-                 );
-                await _grantService.updateGrant(updatedGrant);
-              }
-              _fetchGrants(); // Refresh list
-              if (mounted) Navigator.pop(context);
-            } catch (e) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                 SnackBar(content: Text('Error saving grant: $e')),
-              );
-            }
-        },
-      ),
+  Future<void> _showGrantEditor([Grant? grant]) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => GrantEditorScreen(grant: grant)),
     );
+    
+    // Refresh if grant was saved (result == true)
+    if (result == true) {
+      _fetchGrants();
+    }
   }
 
   Future<void> _deleteGrant(String id) async {
@@ -230,7 +205,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 : _selectedTab == 0 
                     ? _GrantsTab(
                         grants: _grants, 
-                        onEdit: _showGrantDialog,
+                        onEdit: _showGrantEditor,
                         onDelete: _deleteGrant,
                         onRefresh: _fetchGrants
                       ) 
@@ -243,7 +218,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       // Floating Action Button
       floatingActionButton: _selectedTab == 0
           ? FloatingActionButton.extended(
-              onPressed: () => _showGrantDialog(null),
+              onPressed: () => _showGrantEditor(null),
               backgroundColor: AppTheme.slateGray,
               icon: const Icon(Icons.add, color: Colors.white),
               label: const Text('Add Grant', style: TextStyle(color: Colors.white)),
@@ -418,140 +393,6 @@ class _GrantsTab extends StatelessWidget {
           );
         },
       ),
-    );
-  }
-}
-
-// Simple editor dialog for adding/editing grants
-class _GrantEditor extends StatefulWidget {
-  final Grant? grant;
-  final Function(Grant) onSave;
-
-  const _GrantEditor({this.grant, required this.onSave});
-
-  @override
-  State<_GrantEditor> createState() => _GrantEditorState();
-}
-
-class _GrantEditorState extends State<_GrantEditor> {
-  final _formKey = GlobalKey<FormState>();
-  late TextEditingController _titleCtrl;
-  late TextEditingController _providerCtrl;
-  late TextEditingController _amountCtrl;
-  late TextEditingController _descCtrl;
-  late TextEditingController _locationCtrl;
-  DateTime _selectedDate = DateTime.now().add(const Duration(days: 30));
-
-  @override
-  void initState() {
-    super.initState();
-    _titleCtrl = TextEditingController(text: widget.grant?.title ?? '');
-    _providerCtrl = TextEditingController(text: widget.grant?.organizer ?? '');
-    _amountCtrl = TextEditingController(text: widget.grant?.amount ?? '');
-    _descCtrl = TextEditingController(text: widget.grant?.description ?? '');
-    _locationCtrl = TextEditingController(text: widget.grant?.country ?? '');
-    if (widget.grant != null) _selectedDate = widget.grant!.deadline;
-  }
-  
-  @override
-  void dispose() {
-    _titleCtrl.dispose();
-    _providerCtrl.dispose();
-    _amountCtrl.dispose();
-    _descCtrl.dispose();
-    _locationCtrl.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-       child: Padding(
-         padding: const EdgeInsets.all(24.0),
-         child: SingleChildScrollView(
-           child: Form(
-             key: _formKey,
-             child: Column(
-               mainAxisSize: MainAxisSize.min,
-               crossAxisAlignment: CrossAxisAlignment.stretch,
-               children: [
-                 Text(
-                   widget.grant == null ? 'Add New Grant' : 'Edit Grant',
-                   style: Theme.of(context).textTheme.headlineSmall,
-                   textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 24),
-                  TextFormField(
-                    controller: _titleCtrl,
-                    decoration: const InputDecoration(labelText: 'Title'),
-                    validator: (v) => v!.isEmpty ? 'Required' : null,
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    controller: _providerCtrl,
-                    decoration: const InputDecoration(labelText: 'Provider/Organization'),
-                    validator: (v) => v!.isEmpty ? 'Required' : null,
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    controller: _amountCtrl,
-                    decoration: const InputDecoration(labelText: 'Amount (e.g. \$5000)'),
-                    validator: (v) => v!.isEmpty ? 'Required' : null,
-                  ),
-                  const SizedBox(height: 12),
-                   TextFormField(
-                    controller: _locationCtrl,
-                    decoration: const InputDecoration(labelText: 'Location/Country'),
-                    validator: (v) => v!.isEmpty ? 'Required' : null,
-                  ),
-                   const SizedBox(height: 12),
-                  TextFormField(
-                    controller: _descCtrl,
-                    decoration: const InputDecoration(labelText: 'Description'),
-                    maxLines: 3,
-                  ),
-                  const SizedBox(height: 12),
-                  ListTile(
-                    title: const Text("Deadline"),
-                    subtitle: Text(DateFormat('yyyy-MM-dd').format(_selectedDate)),
-                    trailing: const Icon(Icons.calendar_today),
-                    onTap: () async {
-                      final picked = await showDatePicker(
-                        context: context,
-                        initialDate: _selectedDate,
-                        firstDate: DateTime.now(),
-                        lastDate: DateTime(2030),
-                      );
-                      if (picked != null) setState(() => _selectedDate = picked);
-                    },
-                  ),
-                  const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        final newGrant = Grant(
-                          id: '', // Ignored on create
-                          title: _titleCtrl.text,
-                          organizer: _providerCtrl.text,
-                          country: _locationCtrl.text,
-                          category: 'General',
-                          deadline: _selectedDate,
-                          amount: _amountCtrl.text,
-                          description: _descCtrl.text,
-                          eligibilityCriteria: [],
-                          requiredDocuments: [],
-                        );
-                        widget.onSave(newGrant);
-                      }
-                    },
-                    child: const Text('Save Grant'),
-                  ),
-               ],
-             ),
-           ),
-         ),
-       ),
     );
   }
 }

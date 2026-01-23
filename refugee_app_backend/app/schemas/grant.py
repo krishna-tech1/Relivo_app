@@ -9,6 +9,9 @@ class GrantBase(BaseModel):
     amount: Optional[str] = None
     deadline: Optional[datetime] = None
     location: Optional[str] = None
+    apply_url: Optional[str] = None
+    eligibility_criteria: Optional[list[str]] = []
+    required_documents: Optional[list[str]] = []
 
 class GrantCreate(GrantBase):
     pass

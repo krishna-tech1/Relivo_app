@@ -12,6 +12,7 @@ class Grant {
   final bool isVerified;
   final bool isUrgent;
   final String imageUrl;
+  final String applyUrl;
 
   Grant({
     required this.id,
@@ -27,6 +28,7 @@ class Grant {
     this.isVerified = false,
     this.isUrgent = false,
     this.imageUrl = '',
+    this.applyUrl = '',
   });
 
   // Check if deadline is approaching (within 7 days)
@@ -68,6 +70,7 @@ class GrantData {
       ],
       isVerified: true,
       isUrgent: true,
+      applyUrl: 'https://example.com/apply',
     ),
     Grant(
       id: '2',
@@ -92,6 +95,7 @@ class GrantData {
       ],
       isVerified: true,
       isUrgent: false,
+      applyUrl: 'https://example.com/apply',
     ),
     Grant(
       id: '3',
@@ -116,6 +120,7 @@ class GrantData {
       ],
       isVerified: true,
       isUrgent: true,
+      applyUrl: 'https://example.com/apply',
     ),
     Grant(
       id: '4',
@@ -141,6 +146,7 @@ class GrantData {
       ],
       isVerified: true,
       isUrgent: false,
+      applyUrl: 'https://example.com/apply',
     ),
     Grant(
       id: '5',
@@ -165,6 +171,7 @@ class GrantData {
       ],
       isVerified: true,
       isUrgent: true,
+      applyUrl: 'https://example.com/apply',
     ),
   ];
 
