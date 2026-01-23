@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../theme/app_theme.dart';
 import '../models/grant.dart';
+import '../services/grant_service.dart';
 import 'grant_detail_screen.dart';
 import 'filter_screen.dart';
 import 'login_screen.dart';
@@ -15,11 +16,41 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   // State for filtering
-  List<Grant> _filteredGrants = GrantData.sampleGrants;
+  List<Grant> _allGrants = [];
+  List<Grant> _filteredGrants = [];
   String _selectedCategory = 'All Categories';
   String _selectedCountry = 'All Countries';
   final TextEditingController _searchController = TextEditingController();
   DateTime? _lastBackPressTime;
+  bool _isLoading = true;
+  final _grantService = GrantService();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchGrants();
+  }
+
+  Future<void> _fetchGrants() async {
+    setState(() => _isLoading = true);
+    try {
+      final grants = await _grantService.getGrants();
+      if (mounted) {
+        setState(() {
+          _allGrants = grants;
+          _isLoading = false;
+        });
+        _filterGrants(); // Initial filter
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to load grants: $e')),
+        );
+      }
+    }
+  }
 
   void _handleSearch(String query) {
     _filterGrants(query: query);
@@ -29,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final searchQuery = query ?? _searchController.text;
     
     setState(() {
-      _filteredGrants = GrantData.sampleGrants.where((grant) {
+      _filteredGrants = _allGrants.where((grant) {
         final matchesCategory = _selectedCategory == 'All Categories' || 
                               grant.category == _selectedCategory;
         final matchesCountry = _selectedCountry == 'All Countries' || 
@@ -280,50 +311,64 @@ class _HomeScreenState extends State<HomeScreen> {
 
               // Grants List
               Expanded(
-                child: _filteredGrants.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(24),
-                              decoration: BoxDecoration(
-                                color: AppTheme.offWhite,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                Icons.search_off_rounded,
-                                size: 64,
-                                color: AppTheme.mediumGray.withValues(alpha: 0.5),
+                child: RefreshIndicator(
+                  onRefresh: _fetchGrants,
+                  child: _isLoading 
+                    ? const Center(child: CircularProgressIndicator())
+                    : _filteredGrants.isEmpty
+                    ? LayoutBuilder(
+                        builder: (context, constraints) => SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          child: SizedBox(
+                            height: constraints.maxHeight,
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(24),
+                                    decoration: BoxDecoration(
+                                      color: AppTheme.offWhite,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      Icons.search_off_rounded,
+                                      size: 64,
+                                      color: AppTheme.mediumGray.withValues(alpha: 0.5),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    'No grants found',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: AppTheme.mediumGray,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Try adjusting your filters',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: AppTheme.mediumGray.withValues(alpha: 0.7),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            const SizedBox(height: 16),
-                            Text(
-                              'No grants found',
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: AppTheme.mediumGray,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            Text(
-                              'Try adjusting your filters',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: AppTheme.mediumGray.withValues(alpha: 0.7),
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
                       )
                     : ListView.separated(
                         padding: const EdgeInsets.all(AppConstants.paddingLarge),
+                        physics: const AlwaysScrollableScrollPhysics(),
                         itemCount: _filteredGrants.length,
                         separatorBuilder: (context, index) => const SizedBox(height: 20),
                         itemBuilder: (context, index) {
                           return _GrantCard(grant: _filteredGrants[index]);
                         },
-                      ),
+                  ),
+                ),
               ),
             ],
           ),

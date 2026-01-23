@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:refugee_app/screens/grant_detail_screen.dart';
 import '../theme/app_theme.dart';
 import '../models/grant.dart';
 import 'package:refugee_app/screens/admin_login_screen.dart';
@@ -336,8 +337,18 @@ class _GrantsTab extends StatelessWidget {
           return Container(
             margin: const EdgeInsets.only(bottom: AppConstants.paddingMedium),
             decoration: AppTheme.cardDecoration,
-            child: ListTile(
-              contentPadding: const EdgeInsets.all(AppConstants.paddingMedium),
+            child: InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const GrantDetailScreen(),
+                    settings: RouteSettings(arguments: grant),
+                  ),
+                );
+              },
+              child: ListTile(
+                contentPadding: const EdgeInsets.all(AppConstants.paddingMedium),
               leading: Container(
                 width: 48,
                 height: 48,
@@ -390,6 +401,7 @@ class _GrantsTab extends StatelessWidget {
                 },
               ),
             ),
+          ),
           );
         },
       ),

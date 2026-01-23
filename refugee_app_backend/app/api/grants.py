@@ -22,7 +22,7 @@ def read_grants(
     """
     Retrieve grants.
     """
-    grants = db.query(models.Grant).offset(skip).limit(limit).all()
+    grants = db.query(models.Grant).order_by(models.Grant.created_at.desc()).offset(skip).limit(limit).all()
     return grants
 
 @router.post("/", response_model=schemas.Grant)
