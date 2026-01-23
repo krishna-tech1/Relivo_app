@@ -4,13 +4,13 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from app.core.config import settings
 
-DATABASE_URL = settings.DATABASE_URL or "sqlite:///./sql_app.db"
+if not settings.DATABASE_URL:
+    raise ValueError("DATABASE_URL is not set in .env")
+
+DATABASE_URL = settings.DATABASE_URL
 print(f"Connecting to database: {DATABASE_URL}")
 
-if DATABASE_URL.startswith("sqlite"):
-    engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
-else:
-    engine = create_engine(DATABASE_URL)
+engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()

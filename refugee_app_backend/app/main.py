@@ -17,10 +17,15 @@ app.add_middleware(
 )
 
 # Create database tables
-Base.metadata.create_all(bind=engine)
+# Base.metadata.create_all(bind=engine)  <-- REMOVED TO PREVENT CRASH
 
 app.include_router(auth.router)
 
 @app.get("/")
 async def root():
     return {"message": "Refugee App Backend is running"}
+
+@app.get("/test-email")
+async def test_email():
+    return {"message": "Test email sent (Simulation)"}
+
