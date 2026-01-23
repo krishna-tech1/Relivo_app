@@ -1,39 +1,66 @@
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-import os
-
-# Configuration from .env
-MAIL_USERNAME = os.getenv("MAIL_USERNAME")
-MAIL_PASSWORD = os.getenv("MAIL_PASSWORD")
-MAIL_SERVER = os.getenv("MAIL_SERVER")
-# Default to 465 if not set, but it should be set in .env
-MAIL_PORT = int(os.getenv("MAIL_PORT", 465))
-MAIL_FROM = os.getenv("MAIL_FROM")
+import requests
+import json
+from app.core.config import settings
 
 def send_verification_email(email_to: str, code: str):
+    print(f"DEBUG: Attempting to send email via Brevo API to {email_to}")
+    
+    url = "https://api.brevo.com/v3/smtp/email"
+    
+    # The API Key is stored in MAIL_PASSWORD env var based on USER configuration
+    # Assuming 'xkeysib-...' is the API key.
+    api_key = settings.MAIL_PASSWORD
+    
+    if not api_key:
+        print("[ERROR] No API Key (MAIL_PASSWORD) found.")
+        return False
+        
+    sender_email = settings.MAIL_FROM or "no-reply@relivo.app"
+    sender_name = "Relivo App"
+    
+    # Construct Payload
+    payload = {
+        "sender": {
+            "name": sender_name,
+            "email": sender_email
+        },
+        "to": [
+            {
+                "email": email_to
+            }
+        ],
+        "subject": "Your Verification Code - Relivo",
+        "htmlContent": f"""
+        <html>
+            <body style="font-family: Arial, sans-serif;">
+                <div style="padding: 20px; background-color: #f4f4f4; border-radius: 10px;">
+                    <h2 style="color: #333;">Verification Code</h2>
+                    <p style="font-size: 16px;">Your verification code is:</p>
+                    <h1 style="color: #4CAF50; letter-spacing: 5px;">{code}</h1>
+                    <p style="font-size: 14px; color: #666;">Please do not share this code with anyone.</p>
+                </div>
+            </body>
+        </html>
+        """
+    }
+    
+    headers = {
+        'accept': 'application/json',
+        'api-key': api_key,
+        'content-type': 'application/json'
+    }
+    
     try:
-        print(f"DEBUG: Preparing to send email to {email_to} via {MAIL_SERVER}:{MAIL_PORT}")
-        msg = MIMEMultipart()
-        msg["From"] = MAIL_FROM
-        msg["To"] = email_to
-        msg["Subject"] = "Your Verification Code"
-
-        body = f"Your verification code is: {code}"
-        msg.attach(MIMEText(body, "plain"))
-
-        print("DEBUG: Connecting to SMTP server (SSL)...")
-        server = smtplib.SMTP_SSL(MAIL_SERVER, MAIL_PORT)
+        response = requests.post(url, headers=headers, json=payload, timeout=10)
         
-        print("DEBUG: Logging in...")
-        server.login(MAIL_USERNAME, MAIL_PASSWORD)
-        
-        print("DEBUG: Sending email...")
-        server.sendmail(MAIL_FROM, email_to, msg.as_string())
-        
-        server.quit()
-        print("✅ OTP email sent successfully")
-        return True
+        if response.status_code == 201 or response.status_code == 200:
+            print(f"[SUCCESS] Email sent successfully via Brevo API. Response: {response.text}")
+            return True
+        else:
+            print(f"[ERROR] Failed to send email via Brevo API. Status: {response.status_code}")
+            print(f"[ERROR] Response: {response.text}")
+            return False
+            
     except Exception as e:
-        print("❌ Email error:", str(e))
+        print(f"[ERROR] Exception sending email via API: {str(e)}")
         return False

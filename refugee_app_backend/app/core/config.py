@@ -19,4 +19,11 @@ class Settings:
     SMTP_USERNAME: str = os.getenv("SMTP_USERNAME")
     SMTP_PASSWORD: str = os.getenv("SMTP_PASSWORD")
 
+    # Email Config (matching .env)
+    MAIL_USERNAME: str = os.getenv("MAIL_USERNAME")
+    MAIL_PASSWORD: str = os.getenv("MAIL_PASSWORD")
+    MAIL_SERVER: str = os.getenv("MAIL_SERVER")
+    MAIL_PORT: int = int(os.getenv("MAIL_PORT", 587))
+    MAIL_FROM: str = os.getenv("MAIL_FROM")
+
 settings = Settings()
