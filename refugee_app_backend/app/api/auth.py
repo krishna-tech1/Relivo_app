@@ -33,9 +33,37 @@ def register(
         # Check if user already exists
         user = db.query(models.User).filter(models.User.email == user_in.email).first()
         if user:
-            raise HTTPException(status_code=400, detail="Email already registered")
+            if user.is_verified:
+                raise HTTPException(status_code=400, detail="Email already registered")
+            else:
+                # User exists but is NOT verified (e.g. abandoned registration)
+                # Overwrite their details and restart verification
+                user.hashed_password = security.get_password_hash(user_in.password)
+                user.full_name = user_in.full_name
+                user.role = user_in.role
+                
+                # Cleanup any old codes
+                db.query(models.VerificationCode).filter(models.VerificationCode.email == user_in.email).delete()
+                
+                # Create verification code
+                code = generate_verification_code()
+                db_code = models.VerificationCode(email=user_in.email, code=code)
+                db.add(db_code)
+                
+                db.commit()
+                db.refresh(user)
+                
+                # Send verification email in background
+                background_tasks.add_task(send_verification_email, user_in.email, code)
+                
+                print(f"\nExample App: Restart Registration Code for {user_in.email} is: ===> {code} <===\n")
+                
+                return {
+                    "message": "Registration restarted. Check your email.", 
+                    "debug_code": code 
+                }
         
-        # Create user
+        # Create new user
         db_user = models.User(
             email=user_in.email,
             hashed_password=security.get_password_hash(user_in.password),
