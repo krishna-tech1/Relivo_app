@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:refugee_app/screens/register_screen.dart';
 import 'package:refugee_app/screens/admin_login_screen.dart';
 import 'package:refugee_app/screens/forgot_password_screen.dart';
@@ -76,6 +77,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Set status bar to dark icons for visibility
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
+      ),
+    );
+    
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,

@@ -4,20 +4,45 @@ from datetime import datetime
 
 class GrantBase(BaseModel):
     title: str
-    provider: str
+    organizer: str  # Renamed from provider
     description: Optional[str] = None
-    amount: Optional[str] = None
+    eligibility: Optional[str] = None  # Text description
     deadline: Optional[datetime] = None
+    apply_url: str
+    
+    # Optional fields
+    amount: Optional[str] = None
     location: Optional[str] = None
-    apply_url: Optional[str] = None
     eligibility_criteria: Optional[list[str]] = []
     required_documents: Optional[list[str]] = []
+    
+    # Admin curation fields
+    refugee_country: Optional[str] = None
+    is_verified: bool = False
+    is_active: bool = True
+    
+    # Source tracking
+    source: str = "manual"
+    external_id: Optional[str] = None
 
 class GrantCreate(GrantBase):
     pass
 
-class GrantUpdate(GrantBase):
-    pass
+class GrantUpdate(BaseModel):
+    """Partial update schema - all fields optional"""
+    title: Optional[str] = None
+    organizer: Optional[str] = None
+    description: Optional[str] = None
+    eligibility: Optional[str] = None
+    deadline: Optional[datetime] = None
+    apply_url: Optional[str] = None
+    amount: Optional[str] = None
+    location: Optional[str] = None
+    eligibility_criteria: Optional[list[str]] = None
+    required_documents: Optional[list[str]] = None
+    refugee_country: Optional[str] = None
+    is_verified: Optional[bool] = None
+    is_active: Optional[bool] = None
 
 class Grant(GrantBase):
     id: int
@@ -26,3 +51,10 @@ class Grant(GrantBase):
 
     class Config:
         from_attributes = True
+
+class GrantImportResult(BaseModel):
+    """Result of Grants.gov import operation"""
+    imported: int
+    skipped: int
+    errors: list[str] = []
+

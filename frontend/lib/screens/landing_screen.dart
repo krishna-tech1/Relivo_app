@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:refugee_app/screens/login_screen.dart';
 import 'package:refugee_app/screens/register_screen.dart';
 import 'package:refugee_app/widgets/custom_button.dart';
@@ -9,6 +10,15 @@ class LandingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Set status bar to dark icons for visibility
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
+      ),
+    );
+    
     return Scaffold(
       backgroundColor: AppTheme.white,
       body: Stack(

@@ -18,6 +18,8 @@ class AdminDashboardScreen extends StatefulWidget {
 class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   int _selectedTab = 0;
   List<Grant> _grants = [];
+  List<Grant> _verifiedGrants = [];
+  List<Grant> _unverifiedGrants = [];
   bool _isLoading = true;
   final GrantService _grantService = GrantService();
 
@@ -33,6 +35,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       final grants = await _grantService.getGrants();
       setState(() {
         _grants = grants;
+        _verifiedGrants = grants.where((g) => g.isVerified).toList();
+        _unverifiedGrants = grants.where((g) => !g.isVerified).toList();
         _isLoading = false;
       });
     } catch (e) {
@@ -160,15 +164,24 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   const SizedBox(height: 16),
                   
                   // Stats Row
-                  Center(
-                    child: SizedBox(
-                      width: 200,
-                      child: _StatCard(
-                        icon: Icons.description,
-                        label: 'Total Grants',
-                        value: '${_grants.length}',
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _StatCard(
+                          icon: Icons.verified,
+                          label: 'Verified',
+                          value: '${_verifiedGrants.length}',
+                        ),
                       ),
-                    ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _StatCard(
+                          icon: Icons.pending,
+                          label: 'Unverified',
+                          value: '${_unverifiedGrants.length}',
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -181,16 +194,16 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 children: [
                   Expanded(
                     child: _TabButton(
-                      label: 'Grants',
-                      icon: Icons.description,
+                      label: 'Verified Grants',
+                      icon: Icons.verified,
                       isSelected: _selectedTab == 0,
                       onTap: () => setState(() => _selectedTab = 0),
                     ),
                   ),
                   Expanded(
                     child: _TabButton(
-                      label: 'Settings', // Placeholder for now
-                      icon: Icons.settings,
+                      label: 'Unverified Grants',
+                      icon: Icons.pending,
                       isSelected: _selectedTab == 1,
                       onTap: () => setState(() => _selectedTab = 1),
                     ),
@@ -205,26 +218,29 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 ? const Center(child: CircularProgressIndicator())
                 : _selectedTab == 0 
                     ? _GrantsTab(
-                        grants: _grants, 
+                        grants: _verifiedGrants, 
                         onEdit: _showGrantEditor,
                         onDelete: _deleteGrant,
                         onRefresh: _fetchGrants
                       ) 
-                    : const Center(child: Text("Settings not implemented")),
+                    : _GrantsTab(
+                        grants: _unverifiedGrants, 
+                        onEdit: _showGrantEditor,
+                        onDelete: _deleteGrant,
+                        onRefresh: _fetchGrants
+                      ),
             ),
           ],
         ),
       ),
       
       // Floating Action Button
-      floatingActionButton: _selectedTab == 0
-          ? FloatingActionButton.extended(
-              onPressed: () => _showGrantEditor(null),
-              backgroundColor: AppTheme.slateGray,
-              icon: const Icon(Icons.add, color: Colors.white),
-              label: const Text('Add Grant', style: TextStyle(color: Colors.white)),
-            )
-          : null,
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _showGrantEditor(null),
+        backgroundColor: AppTheme.slateGray,
+        icon: const Icon(Icons.add, color: Colors.white),
+        label: const Text('Add Grant', style: TextStyle(color: Colors.white)),
+      ),
     );
   }
 }
