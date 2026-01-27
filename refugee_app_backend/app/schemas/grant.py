@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 
 class GrantBase(BaseModel):
@@ -13,8 +13,8 @@ class GrantBase(BaseModel):
     # Optional fields
     amount: Optional[str] = None
     location: Optional[str] = None
-    eligibility_criteria: Optional[list[str]] = []
-    required_documents: Optional[list[str]] = []
+    eligibility_criteria: Optional[List[str]] = None
+    required_documents: Optional[List[str]] = None
     
     # Admin curation fields
     refugee_country: Optional[str] = None
@@ -38,8 +38,8 @@ class GrantUpdate(BaseModel):
     apply_url: Optional[str] = None
     amount: Optional[str] = None
     location: Optional[str] = None
-    eligibility_criteria: Optional[list[str]] = None
-    required_documents: Optional[list[str]] = None
+    eligibility_criteria: Optional[List[str]] = None
+    required_documents: Optional[List[str]] = None
     refugee_country: Optional[str] = None
     is_verified: Optional[bool] = None
     is_active: Optional[bool] = None
@@ -56,5 +56,5 @@ class GrantImportResult(BaseModel):
     """Result of Grants.gov import operation"""
     imported: int
     skipped: int
-    errors: list[str] = []
+    errors: List[str] = []
 

@@ -1,5 +1,5 @@
 fastapi
-uvicorn
+uvicorn[standard]
 sqlalchemy
 psycopg2-binary
 pydantic
@@ -11,3 +11,5 @@ argon2-cffi
 fastapi-mail
 requests
 lxml
+gunicorn
+python-multipart

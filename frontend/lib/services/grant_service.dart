@@ -12,8 +12,11 @@ class GrantService {
   Future<List<Grant>> getGrants() async {
     final token = await _authService.getToken();
     
+    // Use admin endpoint if authenticated, otherwise use public endpoint
+    final endpoint = token != null ? '/grants/admin/all' : '/grants/public';
+    
     final response = await http.get(
-      Uri.parse('$baseUrl/grants/'),
+      Uri.parse('$baseUrl$endpoint'),
       headers: {
         'Content-Type': 'application/json',
         if (token != null) 'Authorization': 'Bearer $token',
@@ -34,7 +37,7 @@ class GrantService {
     if (token == null) throw Exception('Authentication required');
 
     final response = await http.post(
-      Uri.parse('$baseUrl/grants/'),
+      Uri.parse('$baseUrl/grants/admin'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
@@ -55,7 +58,7 @@ class GrantService {
     if (token == null) throw Exception('Authentication required');
 
     final response = await http.put(
-      Uri.parse('$baseUrl/grants/${grant.id}'),
+      Uri.parse('$baseUrl/grants/admin/${grant.id}'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
@@ -76,7 +79,7 @@ class GrantService {
     if (token == null) throw Exception('Authentication required');
 
     final response = await http.delete(
-      Uri.parse('$baseUrl/grants/$id'),
+      Uri.parse('$baseUrl/grants/admin/$id'),
       headers: {
         'Authorization': 'Bearer $token',
       },
@@ -93,19 +96,19 @@ class GrantService {
     return Grant(
       id: json['id'].toString(),
       title: json['title'],
-      organizer: json['provider'],
-      country: json['location'] ?? 'Unknown',
+      organizer: json['organizer'] ?? json['provider'] ?? 'Unknown',
+      country: json['refugee_country'] ?? json['location'] ?? 'Unknown',
       category: 'General', 
       deadline: json['deadline'] != null ? DateTime.parse(json['deadline']) : DateTime.now().add(const Duration(days: 30)),
       amount: json['amount'] ?? '',
       description: json['description'] ?? '',
       eligibilityCriteria: json['eligibility_criteria'] != null 
           ? List<String>.from(json['eligibility_criteria']) 
-          : [],
+          : (json['eligibility'] != null ? [json['eligibility']] : []),
       requiredDocuments: json['required_documents'] != null 
           ? List<String>.from(json['required_documents']) 
           : [],
-      isVerified: true, 
+      isVerified: json['is_verified'] ?? true, 
       isUrgent: false,
       applyUrl: json['apply_url'] ?? '',
     );
@@ -114,11 +117,11 @@ class GrantService {
   Map<String, dynamic> _toJson(Grant grant) {
     return {
       'title': grant.title,
-      'provider': grant.organizer,
+      'organizer': grant.organizer,
       'description': grant.description,
       'amount': grant.amount,
       'deadline': grant.deadline.toIso8601String(),
-      'location': grant.country,
+      'refugee_country': grant.country,
       'apply_url': grant.applyUrl,
       'eligibility_criteria': grant.eligibilityCriteria,
       'required_documents': grant.requiredDocuments,

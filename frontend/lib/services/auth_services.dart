@@ -8,13 +8,13 @@ class AuthService {
   // ---------------------------------------------------------------------------
   
   // OPTION 1: Production (Render) - Use this if you have deployed your backend changes
-  // static const String baseUrl = "https://relivo-app.onrender.com";
+  static const String baseUrl = "https://relivo-app.onrender.com";
 
   // OPTION 2: Android Emulator - Use this if running on the emulator on the same PC
   // static const String baseUrl = "http://10.0.2.2:8000";
 
   // OPTION 3: Physical Device - Use your PC's IP address (Run 'ipconfig' in cmd to find it)
-  static const String baseUrl = "https://relivo-app.onrender.com"; // Production Render URL
+  // static const String baseUrl = "http://YOUR_PC_IP:8000";
   // ---------------------------------------------------------------------------
 
   // REGISTER
