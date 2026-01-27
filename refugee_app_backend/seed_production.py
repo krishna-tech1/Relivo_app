@@ -10,8 +10,7 @@ from datetime import datetime
 # Add current directory to path
 sys.path.append(os.getcwd())
 
-# Use production database URL
-os.environ['DATABASE_URL'] = 'postgresql://neondb_owner:npg_9sED3UvFJYIr@ep-shiny-butterfly-a18qfdr6.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require'
+
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
