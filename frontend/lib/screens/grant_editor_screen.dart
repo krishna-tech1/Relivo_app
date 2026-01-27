@@ -74,7 +74,8 @@ class _GrantEditorScreenState extends State<GrantEditorScreen> {
         description: _descCtrl.text,
         eligibilityCriteria: _eligibilityCriteria,
         requiredDocuments: _requiredDocuments,
-        applyUrl: _applyUrlCtrl.text,
+        applyUrl: _applyUrlCtrl.text.isEmpty ? 'https://example.com/apply' : _applyUrlCtrl.text,
+        isVerified: widget.grant?.isVerified ?? false, // Preserve existing or default to false
       );
 
       if (widget.grant == null) {

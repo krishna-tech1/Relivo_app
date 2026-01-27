@@ -119,12 +119,18 @@ class GrantService {
       'title': grant.title,
       'organizer': grant.organizer,
       'description': grant.description,
+      'eligibility': grant.eligibilityCriteria.isNotEmpty 
+          ? grant.eligibilityCriteria.join('; ') 
+          : null,  // Convert list to text
       'amount': grant.amount,
       'deadline': grant.deadline.toIso8601String(),
       'refugee_country': grant.country,
-      'apply_url': grant.applyUrl,
+      'apply_url': grant.applyUrl.isNotEmpty ? grant.applyUrl : 'https://example.com/apply',
       'eligibility_criteria': grant.eligibilityCriteria,
       'required_documents': grant.requiredDocuments,
+      'is_verified': grant.isVerified,
+      'is_active': true,
+      'source': 'manual',
     };
   }
 }
