@@ -102,16 +102,22 @@ class GrantsGovImporter:
                           root.findall('.//OpportunitySynopsisDetail_1_0') or \
                           root.findall('.//Opportunity')
             
+            print(f"DEBUG: Found {len(opportunities)} opportunities in XML") 
+            
             for opp in opportunities:
                 try:
                     grant_data = self._extract_grant_data(opp)
                     if grant_data:
                         grants_data.append(grant_data)
+                    else:
+                        print("DEBUG: _extract_grant_data returned None for an opportunity")
                 except Exception as e:
                     error_msg = f"Error parsing opportunity: {str(e)}"
+                    print(f"DEBUG: {error_msg}")
                     self.errors.append(error_msg)
                     continue
             
+            print(f"DEBUG: Extracted {len(grants_data)} valid grant objects")
             return grants_data
             
         except ET.ParseError as e:
@@ -128,11 +134,13 @@ class GrantsGovImporter:
         # Extract opportunity ID (required for deduplication)
         opportunity_id = get_text(opportunity_element, 'OpportunityID')
         if not opportunity_id:
+            print("DEBUG: Missing OpportunityID")
             return None  # Skip if no ID
         
         # Extract title (required)
         title = get_text(opportunity_element, 'OpportunityTitle')
         if not title:
+            print(f"DEBUG: Missing OpportunityTitle for ID {opportunity_id}")
             return None  # Skip if no title
         
         # Extract agency/organizer (required)

@@ -56,11 +56,8 @@ def register(
                 # Send verification email in background
                 background_tasks.add_task(send_verification_email, user_in.email, code)
                 
-                print(f"\nExample App: Restart Registration Code for {user_in.email} is: ===> {code} <===\n")
-                
                 return {
-                    "message": "Registration restarted. Check your email.", 
-                    "debug_code": code 
+                    "message": "Registration restarted. Check your email."
                 }
         
         # Create new user
@@ -84,12 +81,8 @@ def register(
         # Send verification email in background
         background_tasks.add_task(send_verification_email, user_in.email, code)
         
-        # PRINT CODE TO CONSOLE FOR EASY DEVELOPMENT
-        print(f"\nExample App: Registration Code for {user_in.email} is: ===> {code} <===\n")
-        
         return {
-            "message": "User registered successfully", 
-            "debug_code": code 
+            "message": "User registered successfully"
         }
     except HTTPException as he:
         # Re-raise HTTP exceptions (like 400 Email already registered)
@@ -157,31 +150,24 @@ def resend_code(
     
     # Send email
     background_tasks.add_task(send_verification_email, data.email, code)
-    print(f"\nExample App: Resend Code for {data.email} is: ===> {code} <===\n")
     
     return {"message": "Verification code resent"}
 
 @router.post("/login", response_model=schemas.Token)
 def login(user_in: schemas.UserLogin, db: Session = Depends(get_db)):
-    print(f"DEBUG: Login attempt for {user_in.email}")
     user = db.query(models.User).filter(models.User.email == user_in.email).first()
     
     if not user:
-        print("DEBUG: Login failed - User not found in DB")
         # USER REQUEST: Explicitly say email not registered
         raise HTTPException(status_code=404, detail="Email not registered")
         
     keyword_match = security.verify_password(user_in.password, user.hashed_password)
-    print(f"DEBUG: Password match result: {keyword_match}")
     
     if not keyword_match:
-        print("DEBUG: Login failed - Password mismatch")
         # USER REQUEST: Explicitly say incorrect password
         raise HTTPException(status_code=401, detail="Incorrect password")
     
-    print(f"DEBUG: User Verified Status: {user.is_verified}")
     if not user.is_verified:
-        print("DEBUG: Login failed - User not verified")
         raise HTTPException(status_code=400, detail="Email not verified")
     
     access_token = security.create_access_token(
@@ -189,7 +175,6 @@ def login(user_in: schemas.UserLogin, db: Session = Depends(get_db)):
         user_id=user.id,
         role=user.role
     )
-    print("DEBUG: Login successful, generating token")
     return {"access_token": access_token, "token_type": "bearer"}
 
 @router.post("/forgot-password")
@@ -220,7 +205,6 @@ def forgot_password(
     subject = "Reset Your Password - Relivo"
     heading = "Password Reset Code"
     background_tasks.add_task(send_verification_email, data.email, code, subject, heading)
-    print(f"\nExample App: Forgot Password Code for {data.email} is: ===> {code} <===\n")
     
     return {"message": "Password reset OTP sent"}
 

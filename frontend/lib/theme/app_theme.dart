@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppConstants {
@@ -78,6 +79,16 @@ class AppTheme {
         onSurface: textPrimary,
       ),
       scaffoldBackgroundColor: backgroundColor,
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.dark, // Dark icons
+          statusBarBrightness: Brightness.light, // Dark icons for iOS
+        ),
+      ),
       textTheme: GoogleFonts.interTextTheme().copyWith(
         displayLarge: GoogleFonts.inter(
           fontSize: 32,

@@ -109,23 +109,13 @@ class GrantDetailScreen extends StatelessWidget {
                               borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
                               border: Border.all(color: AppTheme.success),
                             ),
-                            child: Row(
-                              children: [
-                                const Icon(
-                                  Icons.attach_money,
-                                  color: AppTheme.success,
-                                  size: 28,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  grant.amount,
-                                  style: const TextStyle(
-                                    fontSize: 28,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppTheme.success,
-                                  ),
-                                ),
-                              ],
+                            child: Text(
+                              grant.amount,
+                              style: const TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                                color: AppTheme.success,
+                              ),
                             ),
                           ),
                           const SizedBox(height: 16),
@@ -268,28 +258,73 @@ class GrantDetailScreen extends StatelessWidget {
         ),
         child: ElevatedButton(
           onPressed: () async {
-            if (grant.applyUrl.isEmpty) {
+            if (grant.applyUrl.isEmpty || grant.applyUrl == 'https://example.com/apply') {
                ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('No application link available')),
+                const SnackBar(
+                  content: Text('No application link available for this grant'),
+                  backgroundColor: AppTheme.warning,
+                ),
               );
               return;
             }
             
-            final Uri url = Uri.parse(grant.applyUrl);
             try {
-              if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-                // If direct launch fails, try again (sometimes helps with checks)
-                // Or just show error
-                 if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Could not open link')),
-                    );
-                 }
+              // Fix URL if it doesn't have http:// or https://
+              String fixedUrl = grant.applyUrl;
+              if (!fixedUrl.startsWith('http://') && !fixedUrl.startsWith('https://')) {
+                fixedUrl = 'https://$fixedUrl';
+              }
+              
+              final Uri url = Uri.parse(fixedUrl);
+              
+              // Check if URL can be launched
+              final canLaunch = await canLaunchUrl(url);
+              
+              if (!canLaunch) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Cannot open this URL: $fixedUrl'),
+                      backgroundColor: AppTheme.error,
+                      duration: const Duration(seconds: 4),
+                    ),
+                  );
+                }
+                return;
+              }
+              
+              // Try to launch in external browser first
+              bool launched = await launchUrl(
+                url, 
+                mode: LaunchMode.externalApplication,
+              );
+              
+              // If external launch fails, try in-app browser
+              if (!launched) {
+                launched = await launchUrl(
+                  url,
+                  mode: LaunchMode.platformDefault,
+                );
+              }
+              
+              // If both fail, show error
+              if (!launched && context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Could not open application link'),
+                    backgroundColor: AppTheme.error,
+                    duration: Duration(seconds: 4),
+                  ),
+                );
               }
             } catch (e) {
                if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Could not open link: $e')),
+                    SnackBar(
+                      content: Text('Error: $e'),
+                      backgroundColor: AppTheme.error,
+                      duration: const Duration(seconds: 5),
+                    ),
                   );
                }
             }

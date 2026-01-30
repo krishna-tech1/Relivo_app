@@ -49,7 +49,6 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
   Future<void> _navigateToNextScreen() async {
     // Wait for 2 seconds and check login status simultaneously
-    // We ensure at least 2 seconds pass by waiting for the Future.delayed
     final results = await Future.wait([
       AuthService().isLoggedIn(),
       Future.delayed(const Duration(seconds: 2)),
@@ -59,7 +58,10 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
     if (!mounted) return;
 
+    // --- User App Flow ---
     if (isLoggedIn) {
+      // Any logged in user (admin, user, org) goes to HomeScreen
+      // Admin access is hidden in User App
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const HomeScreen()),

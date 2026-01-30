@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:refugee_app/screens/register_screen.dart';
-import 'package:refugee_app/screens/admin_login_screen.dart';
 import 'package:refugee_app/screens/forgot_password_screen.dart';
 import 'package:refugee_app/widgets/custom_button.dart';
 import 'package:refugee_app/widgets/custom_text_field.dart';
@@ -77,15 +76,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Set status bar to dark icons for visibility
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark,
-        statusBarBrightness: Brightness.light,
-      ),
-    );
-    
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -178,22 +168,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
-                TextButton.icon(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const AdminLoginScreen(),
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.admin_panel_settings_outlined, size: 18),
-                  label: const Text('Admin Log In'),
-                  style: TextButton.styleFrom(
-                    foregroundColor: Theme.of(context).colorScheme.secondary,
-                  ),
-                ),
+                const SizedBox(height: 24),
               ],
             ),
           ),

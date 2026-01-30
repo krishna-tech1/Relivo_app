@@ -7,6 +7,8 @@ import '../services/auth_services.dart';
 import 'grant_detail_screen.dart';
 import 'filter_screen.dart';
 import 'login_screen.dart';
+import 'my_grants_screen.dart';
+import '../widgets/grant_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -29,14 +31,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // Set status bar to dark icons for visibility on white background
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark,
-        statusBarBrightness: Brightness.light,
-      ),
-    );
     _fetchGrants();
   }
 
@@ -205,24 +199,51 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ],
                         ),
-                        // Logout Button
-                        Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            onTap: _handleLogout,
-                            borderRadius: BorderRadius.circular(12),
-                            child: Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: Colors.red.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: Colors.red.withValues(alpha: 0.2)),
+                        // Profile Menu
+                        PopupMenuButton<String>(
+                          onSelected: (value) {
+                            if (value == 'logout') {
+                              _handleLogout();
+                            } else if (value == 'my_submissions') {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const MyGrantsScreen()),
+                              );
+                            }
+                          },
+                          itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                            const PopupMenuItem<String>(
+                              value: 'my_submissions',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.assignment_ind, color: AppTheme.primaryColor),
+                                  SizedBox(width: 8),
+                                  Text('My Submissions'),
+                                ],
                               ),
-                              child: const Icon(
-                                Icons.logout_rounded,
-                                color: Colors.red,
-                                size: 24,
+                            ),
+                            const PopupMenuDivider(),
+                            const PopupMenuItem<String>(
+                              value: 'logout',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.logout, color: Colors.red),
+                                  SizedBox(width: 8),
+                                  Text('Logout', style: TextStyle(color: Colors.red)),
+                                ],
                               ),
+                            ),
+                          ],
+                          child: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.person,
+                              color: AppTheme.primaryColor,
+                              size: 24,
                             ),
                           ),
                         ),
@@ -379,7 +400,19 @@ class _HomeScreenState extends State<HomeScreen> {
                         itemCount: _filteredGrants.length,
                         separatorBuilder: (context, index) => const SizedBox(height: 20),
                         itemBuilder: (context, index) {
-                          return _GrantCard(grant: _filteredGrants[index]);
+                          return GrantCard(
+                            grant: _filteredGrants[index],
+                            // Custom onTap for HomeScreen (view details only)
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const GrantDetailScreen(),
+                                  settings: RouteSettings(arguments: _filteredGrants[index]),
+                                ),
+                              );
+                            },
+                          );
                         },
                   ),
                 ),
@@ -391,6 +424,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+
+// Internal widget classes removed. Using imported GrantCard. 
 
 class _FilterBadge extends StatelessWidget {
   final String label;
@@ -424,202 +459,4 @@ class _FilterBadge extends StatelessWidget {
     );
   }
 }
-
-class _GrantCard extends StatelessWidget {
-  final Grant grant;
-
-  const _GrantCard({required this.grant});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const GrantDetailScreen(),
-            settings: RouteSettings(arguments: grant),
-          ),
-        );
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppTheme.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF64748B).withValues(alpha: 0.1),
-              blurRadius: 16,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                                decoration: BoxDecoration(
-                                  color: AppTheme.primaryBlue.withValues(alpha: 0.08),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Text(
-                                  grant.category.toUpperCase(),
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w800,
-                                    color: AppTheme.primaryBlue,
-                                    letterSpacing: 0.5,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                grant.title,
-                                style: const TextStyle(
-                                  fontSize: 19,
-                                  fontWeight: FontWeight.w800,
-                                  color: AppTheme.darkGray,
-                                  height: 1.3,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ),
-                        ),
-                        if (grant.isVerified)
-                           Padding(
-                            padding: const EdgeInsets.only(left: 12),
-                            child: Icon(
-                              Icons.verified,
-                              color: AppTheme.verified,
-                              size: 24,
-                            ),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        _IconText(
-                          icon: Icons.calendar_today_rounded,
-                          text: grant.formattedDeadline,
-                          color: grant.hasUpcomingDeadline ? AppTheme.warning : AppTheme.mediumGray,
-                        ),
-                        const SizedBox(width: 16),
-                        _IconText(
-                          icon: Icons.location_on_rounded,
-                          text: grant.country,
-                          color: AppTheme.mediumGray,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                decoration: const BoxDecoration(
-                  color: Color(0xFFF8FAFC),
-                  border: Border(
-                    top: BorderSide(color: Color(0xFFF1F5F9)),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Grant Amount',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: AppTheme.mediumGray,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        Text(
-                          grant.amount,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w800,
-                            color: AppTheme.success,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        gradient: AppTheme.primaryGradient,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppTheme.primaryBlue.withValues(alpha: 0.25),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.arrow_forward_rounded,
-                        size: 20,
-                        color: AppTheme.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _IconText extends StatelessWidget {
-  final IconData icon;
-  final String text;
-  final Color color;
-
-  const _IconText({
-    required this.icon,
-    required this.text,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(icon, size: 16, color: color),
-        const SizedBox(width: 6),
-        Text(
-          text,
-          style: TextStyle(
-            fontSize: 13,
-            color: color,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ],
-    );
-  }
-} 
+ 

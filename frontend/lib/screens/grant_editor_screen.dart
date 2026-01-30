@@ -7,7 +7,10 @@ import 'package:refugee_app/services/grant_service.dart';
 class GrantEditorScreen extends StatefulWidget {
   final Grant? grant;
 
-  const GrantEditorScreen({super.key, this.grant});
+  const GrantEditorScreen({
+    super.key, 
+    this.grant,
+  });
 
   @override
   State<GrantEditorScreen> createState() => _GrantEditorScreenState();
@@ -79,9 +82,9 @@ class _GrantEditorScreenState extends State<GrantEditorScreen> {
       );
 
       if (widget.grant == null) {
-        await _grantService.createGrant(newGrant);
+        await _grantService.submitUserGrant(newGrant);
       } else {
-        await _grantService.updateGrant(newGrant);
+        await _grantService.updateMyGrant(newGrant);
       }
       
       if (mounted) {
@@ -225,7 +228,7 @@ class _GrantEditorScreenState extends State<GrantEditorScreen> {
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 100.0), // Added bottom padding for navigation bar
         child: Form(
           key: _formKey,
           child: Column(
@@ -265,7 +268,11 @@ class _GrantEditorScreenState extends State<GrantEditorScreen> {
 
               TextFormField(
                 controller: _amountCtrl,
-                decoration: const InputDecoration(labelText: 'Amount *', prefixIcon: Icon(Icons.attach_money)),
+                decoration: const InputDecoration(
+                  labelText: 'Amount *', 
+                  prefixIcon: Icon(Icons.payments_outlined),
+                  hintText: 'e.g., \$500 or €1,000',
+                ),
                 validator: (v) => v!.isEmpty ? 'Required' : null,
               ),
               const SizedBox(height: 16),
@@ -336,6 +343,7 @@ class _GrantEditorScreenState extends State<GrantEditorScreen> {
                   child: const Text('Save Grant'),
                 ),
               ),
+              const SizedBox(height: 24), // Extra spacing after button
             ],
           ),
         ),
