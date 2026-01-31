@@ -107,7 +107,7 @@ class _MyGrantsScreenState extends State<MyGrantsScreen> {
           final result = await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const GrantEditorScreen(isUserSubmission: true),
+              builder: (context) => const GrantEditorScreen(),
             ),
           );
           if (result == true) _fetchMyGrants();
@@ -145,7 +145,7 @@ class _MyGrantsScreenState extends State<MyGrantsScreen> {
                   ),
                 )
               : ListView.separated(
-                  padding: const EdgeInsets.all(AppTheme.paddingLarge),
+                  padding: const EdgeInsets.all(AppConstants.paddingLarge),
                   itemCount: _myGrants.length,
                   separatorBuilder: (ctx, i) => const SizedBox(height: 16),
                   itemBuilder: (ctx, index) {
@@ -154,6 +154,7 @@ class _MyGrantsScreenState extends State<MyGrantsScreen> {
                       children: [
                         GrantCard(
                           grant: grant,
+                          showEditButton: !grant.isVerified,
                           onTap: () async {
                             if (!grant.isVerified) {
                               // Allow edit if not verified
@@ -162,7 +163,6 @@ class _MyGrantsScreenState extends State<MyGrantsScreen> {
                                 MaterialPageRoute(
                                   builder: (context) => GrantEditorScreen(
                                     grant: grant,
-                                    isUserSubmission: true,
                                   ),
                                 ),
                               );

@@ -88,8 +88,12 @@ def submit_grant(
     grant_data['is_verified'] = False 
     grant_data['is_active'] = True
 
+    # Check for Admin Role (Admin submissions are trusted)
+    if current_user.role == 'admin':
+        grant_data['is_verified'] = True
+
     # Check for Organization Role
-    if current_user.role == 'organization':
+    elif current_user.role == 'organization':
         org = db.query(models.Organization).filter(models.Organization.user_id == current_user.id).first()
         if org:
             grant_data['organization_id'] = org.id
