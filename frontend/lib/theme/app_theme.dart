@@ -38,6 +38,19 @@ class AppTheme {
   static const Color warning = Color(0xFFF59E0B); // Amber 500
   static const Color error = Color(0xFFEF4444);
 
+  // Category Colors
+  static Color getCategoryColor(String category) {
+    switch (category.toLowerCase()) {
+      case 'housing': return const Color(0xFFF59E0B); // Amber
+      case 'education': return const Color(0xFF3B82F6); // Blue
+      case 'healthcare': return const Color(0xFFEF4444); // Red
+      case 'employment': return const Color(0xFF10B981); // Emerald
+      case 'legal': return const Color(0xFF8B5CF6); // Violet
+      case 'emergency': return const Color(0xFFEC4899); // Pink
+      default: return const Color(0xFF6366F1); // Indigo (General)
+    }
+  }
+
   // Gradients
   static const LinearGradient primaryGradient = LinearGradient(
     colors: [Color(0xFF3B82F6), Color(0xFF1D4ED8)], // Blue 500 to Blue 700

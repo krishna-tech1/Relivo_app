@@ -59,15 +59,16 @@ class GrantCard extends StatelessWidget {
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                                 decoration: BoxDecoration(
-                                  color: AppTheme.primaryBlue.withValues(alpha: 0.08),
+                                  color: AppTheme.getCategoryColor(grant.category).withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: AppTheme.getCategoryColor(grant.category).withValues(alpha: 0.2)),
                                 ),
                                 child: Text(
                                   grant.category.toUpperCase(),
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w800,
-                                    color: AppTheme.primaryBlue,
+                                    color: AppTheme.getCategoryColor(grant.category),
                                     letterSpacing: 0.5,
                                   ),
                                 ),

@@ -308,6 +308,61 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
+              // Category Quick Filter
+              Padding(
+                padding: const EdgeInsets.only(top: 20, bottom: 0),
+                child: SizedBox(
+                  height: 44,
+                  child: ListView.separated(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    scrollDirection: Axis.horizontal,
+                    itemCount: GrantData.categories.length,
+                    separatorBuilder: (context, index) => const SizedBox(width: 10),
+                    itemBuilder: (context, index) {
+                      final category = GrantData.categories[index];
+                      final isSelected = _selectedCategory == category;
+                      final catColor = AppTheme.getCategoryColor(category);
+                      
+                      return InkWell(
+                        onTap: () {
+                          setState(() => _selectedCategory = category);
+                          _filterGrants();
+                        },
+                        borderRadius: BorderRadius.circular(20),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: isSelected ? catColor : catColor.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: isSelected ? catColor : catColor.withValues(alpha: 0.2),
+                              width: 1.5,
+                            ),
+                            boxShadow: isSelected ? [
+                              BoxShadow(
+                                color: catColor.withValues(alpha: 0.3),
+                                blurRadius: 8,
+                                offset: const Offset(0, 4),
+                              )
+                            ] : null,
+                          ),
+                          child: Text(
+                            category,
+                            style: TextStyle(
+                              color: isSelected ? Colors.white : catColor,
+                              fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+
               // Filters Status (if active)
               if (_selectedCategory != 'All Categories' || _selectedCountry != 'All Countries')
                 Padding(

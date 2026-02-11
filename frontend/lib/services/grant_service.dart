@@ -131,7 +131,7 @@ class GrantService {
       title: json['title'],
       organizer: json['organizer'] ?? json['provider'] ?? 'Unknown',
       country: json['refugee_country'] ?? json['location'] ?? 'Unknown',
-      category: json['category'] ?? _detectCategory(json['title'], json['description'], json['organizer']),
+      category: json['category'] ?? 'General', // Now trusting DB category strictly
       deadline: json['deadline'] != null ? DateTime.parse(json['deadline']) : DateTime.now().add(const Duration(days: 30)),
       amount: json['amount'] ?? '',
       description: json['description'] ?? '',

@@ -70,7 +70,7 @@ class GrantDetailScreen extends StatelessWidget {
                             children: [
                               _Badge(
                                 label: grant.category,
-                                gradient: AppTheme.primaryGradient,
+                                color: AppTheme.getCategoryColor(grant.category),
                               ),
                               if (grant.isVerified)
                                 _Badge(
