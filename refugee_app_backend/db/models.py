@@ -61,6 +61,8 @@ class Grant(Base):
     eligibility_criteria = Column(JSON, nullable=True)  # Structured eligibility list
     required_documents = Column(JSON, nullable=True)  # Required documents list
     
+    category = Column(String(100), nullable=True, index=True, default="General")
+    
     # Timestamps
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())

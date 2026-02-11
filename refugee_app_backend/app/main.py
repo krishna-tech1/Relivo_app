@@ -61,6 +61,83 @@ async def health_check():
     except Exception as e:
         return {"status": "unhealthy", "database": "disconnected", "error": str(e)}
 
+@app.get("/migrate-schema")
+async def migrate_schema():
+    """Manually apply schema updates (e.g. adding columns)"""
+    from db.session import engine
+    from sqlalchemy import text
+    try:
+        with engine.connect() as conn:
+            # Check if category column exists
+            # This is a simple way for PostgreSQL/SQLite
+            try:
+                conn.execute(text("ALTER TABLE grants ADD COLUMN category VARCHAR(100) DEFAULT 'General'"))
+                conn.commit()
+                message = "✅ Migration successful: Added 'category' column."
+            except Exception as e:
+                # If column already exists, it will error
+                if "already exists" in str(e).lower() or "duplicate column" in str(e).lower():
+                    message = "ℹ️ 'category' column already exists."
+                else:
+                    return {"error": str(e)}
+
+            # Perform one-time bulk categorization for 'General' grants
+            try:
+                # Update Housing
+                conn.execute(text("""
+                    UPDATE grants SET category = 'Housing' 
+                    WHERE category = 'General' AND (
+                        LOWER(title) LIKE '%housing%' OR LOWER(title) LIKE '%shelter%' OR 
+                        LOWER(description) LIKE '%housing%' OR LOWER(description) LIKE '%shelter%'
+                    )
+                """))
+                # Update Education
+                conn.execute(text("""
+                    UPDATE grants SET category = 'Education' 
+                    WHERE category = 'General' AND (
+                        LOWER(title) LIKE '%education%' OR LOWER(title) LIKE '%training%' OR 
+                        LOWER(description) LIKE '%education%' OR LOWER(description) LIKE '%training%'
+                    )
+                """))
+                # Update Healthcare
+                conn.execute(text("""
+                    UPDATE grants SET category = 'Healthcare' 
+                    WHERE category = 'General' AND (
+                        LOWER(title) LIKE '%health%' OR LOWER(title) LIKE '%medical%' OR 
+                        LOWER(description) LIKE '%health%' OR LOWER(description) LIKE '%medical%'
+                    )
+                """))
+                # Update Employment
+                conn.execute(text("""
+                    UPDATE grants SET category = 'Employment' 
+                    WHERE category = 'General' AND (
+                        LOWER(title) LIKE '%employment%' OR LOWER(title) LIKE '%job%' OR LOWER(title) LIKE '%business%' OR
+                        LOWER(description) LIKE '%employment%' OR LOWER(description) LIKE '%job%' OR LOWER(description) LIKE '%business%'
+                    )
+                """))
+                # Update Legal
+                conn.execute(text("""
+                    UPDATE grants SET category = 'Legal' 
+                    WHERE category = 'General' AND (
+                        LOWER(title) LIKE '%legal%' OR LOWER(title) LIKE '%asylum%' OR 
+                        LOWER(description) LIKE '%legal%' OR LOWER(description) LIKE '%asylum%'
+                    )
+                """))
+                # Update Emergency
+                conn.execute(text("""
+                    UPDATE grants SET category = 'Emergency' 
+                    WHERE category = 'General' AND (
+                        LOWER(title) LIKE '%emergency%' OR LOWER(title) LIKE '%urgent%' OR 
+                        LOWER(description) LIKE '%emergency%' OR LOWER(description) LIKE '%urgent%'
+                    )
+                """))
+                conn.commit()
+                return {"message": f"{message} Categorization sync complete."}
+            except Exception as e:
+                return {"message": f"{message} Error during categorization: {str(e)}"}
+    except Exception as e:
+        return {"error": str(e)}
+
     finally:
         db.close()
 

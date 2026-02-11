@@ -172,6 +172,9 @@ class GrantsGovImporter:
         amount = get_text(opportunity_element, 'AwardCeiling') or \
                 get_text(opportunity_element, 'EstimatedTotalProgramFunding')
         
+        # Detect category
+        category = self._detect_category(title, description, organizer)
+        
         return {
             'external_id': opportunity_id,
             'title': title[:500],  # Limit length
@@ -181,11 +184,31 @@ class GrantsGovImporter:
             'deadline': deadline,
             'apply_url': apply_url,
             'amount': amount[:100] if amount else None,
+            'category': category,
             'source': 'grants.gov',
             'is_verified': False,
             'is_active': True,
             'refugee_country': None
         }
+    
+    def _detect_category(self, title: str, description: str, organizer: str) -> str:
+        """Detect category based on keywords"""
+        text = f"{title} {description or ''} {organizer}".lower()
+        
+        if any(kw in text for kw in ['housing', 'shelter', 'accommodation', 'rent']):
+            return 'Housing'
+        elif any(kw in text for kw in ['education', 'training', 'school', 'university', 'curriculum', 'teaching']):
+            return 'Education'
+        elif any(kw in text for kw in ['health', 'medical', 'healthcare', 'doctor', 'patient', 'disease']):
+            return 'Healthcare'
+        elif any(kw in text for kw in ['employment', 'job', 'business', 'entrepreneur', 'startup', 'work', 'career']):
+            return 'Employment'
+        elif any(kw in text for kw in ['legal', 'reunification', 'asylum', 'law', 'lawyer', 'rights', 'advocacy']):
+            return 'Legal'
+        elif any(kw in text for kw in ['emergency', 'urgent', 'crisis', 'disaster', 'immediate', 'relief']):
+            return 'Emergency'
+            
+        return 'General'
     
     def _parse_date(self, date_str: str) -> datetime:
         """Parse date string to datetime object"""

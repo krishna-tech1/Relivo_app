@@ -20,6 +20,7 @@ class GrantBase(BaseModel):
     refugee_country: Optional[str] = None
     is_verified: bool = False
     is_active: bool = True
+    category: Optional[str] = "General"
     
     # Source tracking
     source: str = "manual"
@@ -43,6 +44,7 @@ class GrantUpdate(BaseModel):
     refugee_country: Optional[str] = None
     is_verified: Optional[bool] = None
     is_active: Optional[bool] = None
+    category: Optional[str] = None
 
 class Grant(GrantBase):
     id: int

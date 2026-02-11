@@ -53,6 +53,7 @@ try:
                 "amount": "€5,000",
                 "description": "Financial assistance for refugees seeking emergency housing solutions. This grant covers rent deposits, first month's rent, and essential furniture.",
                 "apply_url": "https://www.unhcr.org/housing-assistance",
+                "category": "Housing",
                 "is_verified": True,
                 "is_active": True,
                 "source": "manual"
@@ -65,6 +66,7 @@ try:
                 "amount": "€3,500",
                 "description": "Support for refugees pursuing education, vocational training, or professional certification programs.",
                 "apply_url": "https://www.eef.org/education-grants",
+                "category": "Education",
                 "is_verified": True,
                 "is_active": True,
                 "source": "manual"
@@ -77,6 +79,7 @@ try:
                 "amount": "€2,000",
                 "description": "Medical assistance for refugees requiring healthcare services not covered by standard insurance.",
                 "apply_url": "https://www.imc.org/healthcare-fund",
+                "category": "Healthcare",
                 "is_verified": True,
                 "is_active": True,
                 "source": "manual"
@@ -89,6 +92,7 @@ try:
                 "amount": "€8,000",
                 "description": "Funding for refugees looking to start their own small business or social enterprise.",
                 "apply_url": "https://www.ren.org/startup-grants",
+                "category": "Employment",
                 "is_verified": True,
                 "is_active": True,
                 "source": "manual"
@@ -101,6 +105,7 @@ try:
                 "amount": "€4,500",
                 "description": "Legal and financial assistance for family reunification processes.",
                 "apply_url": "https://www.redcross.org/family-reunification",
+                "category": "Legal",
                 "is_verified": True,
                 "is_active": True,
                 "source": "manual"
@@ -113,6 +118,7 @@ try:
                 "amount": "€1,000",
                 "description": "This is a test grant that is unverified for admin testing purposes.",
                 "apply_url": "https://www.test.org/grant",
+                "category": "General",
                 "is_verified": False,
                 "is_active": True,
                 "source": "manual"
