@@ -126,19 +126,19 @@ class GrantService {
   // Helper methods to convert between Grant model and Backend JSON
   // Note: Backend JSON keys might differ slightly, adjusting here.
   Grant _fromJson(Map<String, dynamic> json) {
-    // 1. Prioritize explicitly stored DB category
-    String? category = json['category'];
+    // DEBUG: Print what we're receiving from backend
+    print('🔍 DEBUG Grant JSON: id=${json['id']}, title=${json['title']}, category=${json['category']}');
     
-    // 2. Only if DB has NO category (null or 'General'), try to auto-detect
-    if (category == null || category == 'General' || category.isEmpty) {
-      final detected = _detectCategory(json['title'], json['description'], json['organizer']);
-      // If detection found something more specific than General, use it
-      if (detected != 'General') {
-        category = detected;
-      } else {
-        category = 'General';
-      }
+    // STRICTLY trust the database category - never override it
+    String category = json['category'] ?? 'General';
+    
+    // ONLY use detection if database explicitly has null or empty string
+    // Do NOT run detection if database has 'General' - that's a valid choice
+    if (category.isEmpty) {
+      category = _detectCategory(json['title'], json['description'], json['organizer']);
     }
+
+    print('✅ Final category for "${json['title']}": $category');
 
     return Grant(
       id: json['id'].toString(),
