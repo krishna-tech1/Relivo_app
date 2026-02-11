@@ -131,7 +131,7 @@ class GrantService {
       title: json['title'],
       organizer: json['organizer'] ?? json['provider'] ?? 'Unknown',
       country: json['refugee_country'] ?? json['location'] ?? 'Unknown',
-      category: _detectCategory(json['title'], json['description'], json['organizer']),
+      category: json['category'] ?? _detectCategory(json['title'], json['description'], json['organizer']),
       deadline: json['deadline'] != null ? DateTime.parse(json['deadline']) : DateTime.now().add(const Duration(days: 30)),
       amount: json['amount'] ?? '',
       description: json['description'] ?? '',
@@ -184,6 +184,7 @@ class GrantService {
       'required_documents': grant.requiredDocuments,
       'is_verified': grant.isVerified,
       'is_active': true,
+      'category': grant.category,
       'source': 'manual',
     };
   }

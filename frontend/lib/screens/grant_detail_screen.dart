@@ -195,42 +195,7 @@ class GrantDetailScreen extends StatelessWidget {
                         }).toList(),
                       ),
                     ),
-                    const SizedBox(height: AppConstants.paddingMedium),
-                    
-                    // Required Documents Card
-                    _SectionCard(
-                      title: 'Required Documents',
-                      icon: Icons.folder_outlined,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: grant.requiredDocuments.map((document) {
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Icon(
-                                  Icons.insert_drive_file,
-                                  color: AppTheme.primaryBlue,
-                                  size: 20,
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Text(
-                                    document,
-                                    style: const TextStyle(
-                                      fontSize: 15,
-                                      height: 1.5,
-                                      color: AppTheme.darkGray,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ),
+
                     const SizedBox(height: 80), // Space for floating button
                   ],
                 ),

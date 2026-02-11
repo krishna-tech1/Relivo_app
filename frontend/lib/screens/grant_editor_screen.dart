@@ -28,6 +28,7 @@ class _GrantEditorScreenState extends State<GrantEditorScreen> {
   List<String> _eligibilityCriteria = [];
   List<String> _requiredDocuments = [];
   DateTime _selectedDate = DateTime.now().add(const Duration(days: 30));
+  String _selectedCategory = 'General';
   bool _isLoading = false;
 
   final _grantService = GrantService();
@@ -44,6 +45,7 @@ class _GrantEditorScreenState extends State<GrantEditorScreen> {
     
     if (widget.grant != null) {
       _selectedDate = widget.grant!.deadline;
+      _selectedCategory = widget.grant!.category;
       _eligibilityCriteria = List.from(widget.grant!.eligibilityCriteria);
       _requiredDocuments = List.from(widget.grant!.requiredDocuments);
     }
@@ -71,7 +73,7 @@ class _GrantEditorScreenState extends State<GrantEditorScreen> {
         title: _titleCtrl.text,
         organizer: _providerCtrl.text,
         country: _locationCtrl.text,
-        category: 'General',
+        category: _selectedCategory,
         deadline: _selectedDate,
         amount: _amountCtrl.text,
         description: _descCtrl.text,
@@ -240,8 +242,24 @@ class _GrantEditorScreenState extends State<GrantEditorScreen> {
               
               TextFormField(
                 controller: _titleCtrl,
+                maxLength: 20,
                 decoration: const InputDecoration(labelText: 'Grant Title *', prefixIcon: Icon(Icons.title)),
                 validator: (v) => v!.isEmpty ? 'Required' : null,
+              ),
+              const SizedBox(height: 16),
+
+              DropdownButtonFormField<String>(
+                value: GrantData.categories.contains(_selectedCategory) ? _selectedCategory : 'General',
+                decoration: const InputDecoration(
+                  labelText: 'Category *',
+                  prefixIcon: Icon(Icons.category),
+                ),
+                items: GrantData.categories
+                    .where((c) => c != 'All Categories')
+                    .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                    .toList(),
+                onChanged: (v) => setState(() => _selectedCategory = v!),
+                validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,
               ),
               const SizedBox(height: 16),
               
@@ -250,6 +268,7 @@ class _GrantEditorScreenState extends State<GrantEditorScreen> {
                   Expanded(
                     child: TextFormField(
                       controller: _providerCtrl,
+                      maxLength: 20,
                       decoration: const InputDecoration(labelText: 'Provider *', prefixIcon: Icon(Icons.business)),
                       validator: (v) => v!.isEmpty ? 'Required' : null,
                     ),
@@ -258,6 +277,7 @@ class _GrantEditorScreenState extends State<GrantEditorScreen> {
                   Expanded(
                     child: TextFormField(
                       controller: _locationCtrl,
+                      maxLength: 20,
                       decoration: const InputDecoration(labelText: 'Location *', prefixIcon: Icon(Icons.location_on)),
                       validator: (v) => v!.isEmpty ? 'Required' : null,
                     ),
@@ -268,6 +288,7 @@ class _GrantEditorScreenState extends State<GrantEditorScreen> {
 
               TextFormField(
                 controller: _amountCtrl,
+                maxLength: 20,
                 decoration: const InputDecoration(
                   labelText: 'Amount *', 
                   prefixIcon: Icon(Icons.payments_outlined),
@@ -279,6 +300,7 @@ class _GrantEditorScreenState extends State<GrantEditorScreen> {
 
               TextFormField(
                 controller: _descCtrl,
+                maxLength: 250,
                 decoration: const InputDecoration(labelText: 'Description', prefixIcon: Icon(Icons.description)),
                 maxLines: 3,
               ),
@@ -330,8 +352,7 @@ class _GrantEditorScreenState extends State<GrantEditorScreen> {
 
               const SizedBox(height: 16),
 
-              _buildSectionHeader('Required Documents', () => _addListItem(_requiredDocuments, 'Document')),
-              _buildList(_requiredDocuments, 'Document'),
+
               
               const SizedBox(height: 32),
               
