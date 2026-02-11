@@ -183,6 +183,7 @@ class GrantData {
     'Employment',
     'Legal',
     'Emergency',
+    'General',
   ];
 
   static List<String> countries = [

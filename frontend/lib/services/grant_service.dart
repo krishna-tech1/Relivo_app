@@ -126,12 +126,26 @@ class GrantService {
   // Helper methods to convert between Grant model and Backend JSON
   // Note: Backend JSON keys might differ slightly, adjusting here.
   Grant _fromJson(Map<String, dynamic> json) {
+    // 1. Prioritize explicitly stored DB category
+    String? category = json['category'];
+    
+    // 2. Only if DB has NO category (null or 'General'), try to auto-detect
+    if (category == null || category == 'General' || category.isEmpty) {
+      final detected = _detectCategory(json['title'], json['description'], json['organizer']);
+      // If detection found something more specific than General, use it
+      if (detected != 'General') {
+        category = detected;
+      } else {
+        category = 'General';
+      }
+    }
+
     return Grant(
       id: json['id'].toString(),
-      title: json['title'],
+      title: json['title'] ?? 'Untitled Grant',
       organizer: json['organizer'] ?? json['provider'] ?? 'Unknown',
       country: json['refugee_country'] ?? json['location'] ?? 'Unknown',
-      category: json['category'] ?? 'General', // Now trusting DB category strictly
+      category: category,
       deadline: json['deadline'] != null ? DateTime.parse(json['deadline']) : DateTime.now().add(const Duration(days: 30)),
       amount: json['amount'] ?? '',
       description: json['description'] ?? '',
@@ -141,7 +155,7 @@ class GrantService {
       requiredDocuments: json['required_documents'] != null 
           ? List<String>.from(json['required_documents']) 
           : [],
-      isVerified: json['is_verified'] ?? true, 
+      isVerified: json['is_verified'] ?? false, 
       isUrgent: false,
       applyUrl: json['apply_url'] ?? '',
     );
