@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:refugee_app/services/auth_services.dart';
+import 'package:refugee_app/theme/app_theme.dart';
 import 'package:refugee_app/widgets/custom_button.dart';
 import 'package:refugee_app/widgets/custom_text_field.dart';
 import 'reset_password_screen.dart';
@@ -18,9 +19,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   void _handleSendCode() async {
     if (_emailController.text.isEmpty || !_emailController.text.contains('@')) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a valid email address')),
-      );
+      AppTheme.showAlert(context, 'Please enter a valid email address');
       return;
     }
 
@@ -30,6 +29,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       await _authService.forgotPassword(_emailController.text.trim());
       
       if (mounted) {
+        AppTheme.showSuccess(context, 'Reset code sent to your email');
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -41,12 +41,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        AppTheme.showAlert(context, e.toString());
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);

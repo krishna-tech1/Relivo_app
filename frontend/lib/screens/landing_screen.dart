@@ -22,7 +22,7 @@ class LandingScreen extends StatelessWidget {
               width: 300,
               height: 300,
               decoration: BoxDecoration(
-                color: AppTheme.primaryBlue.withValues(alpha: 0.05),
+                color: AppTheme.primaryBlue.withOpacity(0.05),
                 shape: BoxShape.circle,
               ),
             ),
@@ -45,7 +45,7 @@ class LandingScreen extends StatelessWidget {
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: AppTheme.primaryBlue.withValues(alpha: 0.15),
+                          color: AppTheme.primaryBlue.withOpacity(0.15),
                           blurRadius: 30,
                           offset: const Offset(0, 10),
                         ),

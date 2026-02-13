@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:refugee_app/services/auth_services.dart';
+import 'package:refugee_app/theme/app_theme.dart';
 import 'package:refugee_app/widgets/custom_button.dart';
 import 'package:refugee_app/widgets/custom_text_field.dart';
 import 'login_screen.dart';
@@ -21,21 +22,15 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
   void _handleReset() async {
     if (_codeController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter the verification code')),
-      );
+      AppTheme.showAlert(context, 'Please enter the verification code');
       return;
     }
     if (_passwordController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a new password')),
-      );
+      AppTheme.showAlert(context, 'Please enter a new password');
       return;
     }
     if (_passwordController.text != _confirmPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Passwords do not match')),
-      );
+      AppTheme.showAlert(context, 'Passwords do not match');
       return;
     }
 
@@ -49,12 +44,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       );
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Password reset successfully! Please log in.'),
-            backgroundColor: Colors.green,
-          ),
-        );
+        AppTheme.showSuccess(context, 'Password reset successfully! Please log in.');
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => const LoginScreen()),
@@ -63,12 +53,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        AppTheme.showAlert(context, e.toString());
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);

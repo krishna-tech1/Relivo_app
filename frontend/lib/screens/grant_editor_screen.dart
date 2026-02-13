@@ -90,16 +90,12 @@ class _GrantEditorScreenState extends State<GrantEditorScreen> {
       }
       
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-           SnackBar(content: Text('Grant saved successfully!'), backgroundColor: AppTheme.success),
-        );
+        AppTheme.showSuccess(context, widget.grant == null ? 'Grant submitted successfully!' : 'Grant updated successfully!');
         Navigator.pop(context, true); // Return true to indicate success
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-           SnackBar(content: Text('Error saving grant: $e'), backgroundColor: AppTheme.error),
-        );
+        AppTheme.showAlert(context, 'Error saving grant: $e');
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -115,11 +111,19 @@ class _GrantEditorScreenState extends State<GrantEditorScreen> {
           title: Text('Add $itemName'),
           content: TextField(
             controller: ctrl,
-            decoration: InputDecoration(hintText: 'Enter $itemName'),
+            decoration: InputDecoration(
+              hintText: 'e.g., Valid Passport',
+              filled: true,
+              fillColor: AppTheme.offWhite,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+            ),
             autofocus: true,
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+            TextButton(
+              onPressed: () => Navigator.pop(context), 
+              child: const Text('Cancel', style: TextStyle(color: AppTheme.mediumGray)),
+            ),
             ElevatedButton(
               onPressed: () {
                 if (ctrl.text.isNotEmpty) {
@@ -127,7 +131,11 @@ class _GrantEditorScreenState extends State<GrantEditorScreen> {
                   Navigator.pop(context);
                 }
               },
-              child: const Text('Add'),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              child: const Text('Add Item'),
             ),
           ],
         );
@@ -144,11 +152,19 @@ class _GrantEditorScreenState extends State<GrantEditorScreen> {
           title: Text('Edit $itemName'),
           content: TextField(
             controller: ctrl,
-            decoration: InputDecoration(hintText: 'Enter $itemName'),
+            decoration: InputDecoration(
+              hintText: 'e.g., Valid Passport',
+              filled: true,
+              fillColor: AppTheme.offWhite,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+            ),
             autofocus: true,
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+            TextButton(
+              onPressed: () => Navigator.pop(context), 
+              child: const Text('Cancel', style: TextStyle(color: AppTheme.mediumGray)),
+            ),
             TextButton(
               onPressed: () {
                 setState(() => list.removeAt(index));
@@ -242,14 +258,16 @@ class _GrantEditorScreenState extends State<GrantEditorScreen> {
               
               TextFormField(
                 controller: _titleCtrl,
-                maxLength: 20,
+                maxLength: 100,
                 decoration: const InputDecoration(labelText: 'Grant Title *', prefixIcon: Icon(Icons.title)),
-                validator: (v) => v!.isEmpty ? 'Required' : null,
+                validator: (v) => v!.isEmpty ? 'Required' : (v.length < 3 ? 'Too short' : null),
               ),
               const SizedBox(height: 16),
 
               DropdownButtonFormField<String>(
-                value: GrantData.categories.contains(_selectedCategory) ? _selectedCategory : 'General',
+                value: GrantData.categories.contains(_selectedCategory) && _selectedCategory != 'All Categories' 
+                    ? _selectedCategory 
+                    : 'General',
                 decoration: const InputDecoration(
                   labelText: 'Category *',
                   prefixIcon: Icon(Icons.category),
@@ -268,7 +286,7 @@ class _GrantEditorScreenState extends State<GrantEditorScreen> {
                   Expanded(
                     child: TextFormField(
                       controller: _providerCtrl,
-                      maxLength: 20,
+                      maxLength: 100,
                       decoration: const InputDecoration(labelText: 'Provider *', prefixIcon: Icon(Icons.business)),
                       validator: (v) => v!.isEmpty ? 'Required' : null,
                     ),
@@ -277,7 +295,7 @@ class _GrantEditorScreenState extends State<GrantEditorScreen> {
                   Expanded(
                     child: TextFormField(
                       controller: _locationCtrl,
-                      maxLength: 20,
+                      maxLength: 50,
                       decoration: const InputDecoration(labelText: 'Location *', prefixIcon: Icon(Icons.location_on)),
                       validator: (v) => v!.isEmpty ? 'Required' : null,
                     ),
@@ -288,7 +306,7 @@ class _GrantEditorScreenState extends State<GrantEditorScreen> {
 
               TextFormField(
                 controller: _amountCtrl,
-                maxLength: 20,
+                maxLength: 50,
                 decoration: const InputDecoration(
                   labelText: 'Amount *', 
                   prefixIcon: Icon(Icons.payments_outlined),
@@ -300,9 +318,9 @@ class _GrantEditorScreenState extends State<GrantEditorScreen> {
 
               TextFormField(
                 controller: _descCtrl,
-                maxLength: 250,
+                maxLength: 2000,
                 decoration: const InputDecoration(labelText: 'Description', prefixIcon: Icon(Icons.description)),
-                maxLines: 3,
+                maxLines: 5,
               ),
               const SizedBox(height: 16),
 
@@ -340,6 +358,11 @@ class _GrantEditorScreenState extends State<GrantEditorScreen> {
                   hintText: 'https://example.com/apply-here',
                   helperText: 'Users will be redirected to this link when they click Apply',
                 ),
+                validator: (v) {
+                  if (v == null || v.isEmpty) return null; // Optional
+                  if (!v.contains('.') || v.length < 5) return 'Invalid URL';
+                  return null;
+                },
               ),
               
               const SizedBox(height: 24),

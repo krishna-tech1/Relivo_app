@@ -39,7 +39,11 @@ class AppTheme {
   static const Color error = Color(0xFFEF4444);
 
   // Category Colors
-  static Color getCategoryColor(String category) {
+  static Color getCategoryColor(String? category) {
+    if (category == null || category.isEmpty) {
+      return const Color(0xFF6366F1); // General (Indigo)
+    }
+    
     switch (category.toLowerCase()) {
       case 'housing': return const Color(0xFFF59E0B); // Amber
       case 'education': return const Color(0xFF3B82F6); // Blue
@@ -98,9 +102,26 @@ class AppTheme {
         surfaceTintColor: Colors.transparent,
         systemOverlayStyle: SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.dark, // Dark icons
-          statusBarBrightness: Brightness.light, // Dark icons for iOS
+          statusBarIconBrightness: Brightness.dark, 
+          statusBarBrightness: Brightness.light, 
         ),
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+        titleTextStyle: GoogleFonts.inter(
+          fontSize: 22,
+          fontWeight: FontWeight.w900,
+          color: darkGray,
+          letterSpacing: -0.5,
+        ),
+        contentTextStyle: GoogleFonts.inter(
+          fontSize: 15,
+          color: mediumGray,
+          height: 1.5,
+        ),
+        actionsPadding: const EdgeInsets.fromLTRB(0, 0, 16, 16),
       ),
       textTheme: GoogleFonts.interTextTheme().copyWith(
         displayLarge: GoogleFonts.inter(
@@ -163,6 +184,62 @@ class AppTheme {
           borderSide: const BorderSide(color: errorColor),
         ),
         hintStyle: GoogleFonts.inter(color: textSecondary),
+      ),
+    );
+  }
+
+  static void showAlert(BuildContext context, String message, {bool isError = true}) {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(
+              isError ? Icons.error_outline_rounded : Icons.info_outline_rounded, 
+              color: Colors.white,
+              size: 20,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                message.replaceAll("Exception: ", ""),
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: isError ? error : primaryBlue,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        margin: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+        elevation: 10,
+        duration: const Duration(seconds: 4),
+      ),
+    );
+  }
+
+  static void showSuccess(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle_outline_rounded, color: Colors.white, size: 20),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                message,
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: success,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        margin: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+        elevation: 10,
+        duration: const Duration(seconds: 3),
       ),
     );
   }

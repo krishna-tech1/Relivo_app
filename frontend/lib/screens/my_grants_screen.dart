@@ -37,9 +37,7 @@ class _MyGrantsScreenState extends State<MyGrantsScreen> {
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to load my grants: $e')),
-        );
+        AppTheme.showAlert(context, 'Failed to load my grants: $e');
       }
     }
   }
@@ -47,17 +45,13 @@ class _MyGrantsScreenState extends State<MyGrantsScreen> {
   Future<void> _deleteGrant(String id) async {
     try {
       await _grantService.deleteMyGrant(id);
-      _fetchMyGrants(); // Refresh
+      _fetchMyGrants(); 
       if (mounted) {
-         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Grant deleted successfully')),
-        );
+        AppTheme.showSuccess(context, 'Grant deleted successfully');
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to delete grant: $e')),
-        );
+        AppTheme.showAlert(context, 'Failed to delete grant: $e');
       }
     }
   }
@@ -66,20 +60,29 @@ class _MyGrantsScreenState extends State<MyGrantsScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Grant?'),
-        content: const Text('Are you sure you want to delete this submission?'),
+        icon: const Icon(Icons.delete_outline_rounded, color: Colors.red, size: 40),
+        title: const Text('Delete Submission?'),
+        content: const Text(
+          'This action cannot be undone. Are you sure you want to permanently delete this grant?',
+          textAlign: TextAlign.center,
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: const Text('Cancel', style: TextStyle(color: AppTheme.mediumGray, fontWeight: FontWeight.bold)),
           ),
-          TextButton(
+          ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
               _deleteGrant(id);
             },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Delete'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red.shade50,
+              foregroundColor: Colors.red,
+              elevation: 0,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: const Text('Delete Now', style: TextStyle(fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -89,75 +92,119 @@ class _MyGrantsScreenState extends State<MyGrantsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.offWhite,
+      backgroundColor: AppTheme.white,
       appBar: AppBar(
         title: const Text('My Submissions'),
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppTheme.white,
+        surfaceTintColor: AppTheme.white,
         elevation: 0,
         centerTitle: true,
         titleTextStyle: const TextStyle(
           color: AppTheme.darkGray,
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
+          fontSize: 18,
+          fontWeight: FontWeight.w900,
         ),
-        iconTheme: const IconThemeData(color: AppTheme.darkGray),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () async {
-          final result = await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const GrantEditorScreen(),
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: CircleAvatar(
+            backgroundColor: AppTheme.offWhite,
+            child: IconButton(
+              onPressed: () => Navigator.pop(context),
+              icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppTheme.darkGray, size: 18),
             ),
-          );
-          if (result == true) _fetchMyGrants();
-        },
-        label: const Text('New Grant'),
-        icon: const Icon(Icons.add),
-        backgroundColor: AppTheme.primaryColor,
+          ),
+        ),
+      ),
+      floatingActionButton: Container(
+        height: 56,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: FloatingActionButton.extended(
+          onPressed: () async {
+            final result = await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const GrantEditorScreen(),
+              ),
+            );
+            if (result == true) _fetchMyGrants();
+          },
+          label: const Text(
+            'New Submission',
+            style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 0.5),
+          ),
+          icon: const Icon(Icons.add_rounded, size: 24),
+          backgroundColor: AppTheme.darkGray,
+          foregroundColor: Colors.white,
+          elevation: 4,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        ),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _myGrants.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.assignment_outlined, size: 64, color: AppTheme.mediumGray.withValues(alpha: 0.5)),
-                      const SizedBox(height: 16),
-                      Text(
-                        'No submissions yet',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: AppTheme.mediumGray,
-                          fontWeight: FontWeight.w600,
+              ? LayoutBuilder(
+                  builder: (context, constraints) => SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              height: 120,
+                              width: 120,
+                              decoration: BoxDecoration(
+                                color: AppTheme.offWhite,
+                                borderRadius: BorderRadius.circular(40),
+                              ),
+                              child: Icon(
+                                Icons.note_add_rounded, 
+                                size: 50, 
+                                color: AppTheme.mediumGray.withOpacity(0.2)
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            const Text(
+                              'No submissions yet',
+                              style: TextStyle(
+                                fontSize: 22,
+                                color: AppTheme.darkGray,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 40),
+                              child: Text(
+                                'Help the community by submitting available grants you know of.',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: AppTheme.mediumGray,
+                                  height: 1.5,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Submit a grant to help the community!',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: AppTheme.mediumGray.withValues(alpha: 0.7),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 )
               : ListView.separated(
-                  padding: const EdgeInsets.all(AppConstants.paddingLarge),
+                  padding: const EdgeInsets.fromLTRB(24, 12, 24, 100),
                   itemCount: _myGrants.length,
-                  separatorBuilder: (ctx, i) => const SizedBox(height: 16),
+                  separatorBuilder: (ctx, i) => const SizedBox(height: 20),
                   itemBuilder: (ctx, index) {
                     final grant = _myGrants[index];
-                    return Stack(
+                    return Column(
                       children: [
                         GrantCard(
                           grant: grant,
                           showEditButton: !grant.isVerified,
                           onTap: () async {
                             if (!grant.isVerified) {
-                              // Allow edit if not verified
                               final result = await Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -168,7 +215,6 @@ class _MyGrantsScreenState extends State<MyGrantsScreen> {
                               );
                               if (result == true) _fetchMyGrants();
                             } else {
-                              // View only
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -179,17 +225,22 @@ class _MyGrantsScreenState extends State<MyGrantsScreen> {
                             }
                           },
                         ),
-                        // Delete Button for unverified grants
                         if (!grant.isVerified)
-                          Positioned(
-                            top: 8,
-                            right: 8,
-                            child: IconButton(
-                              icon: const Icon(Icons.delete_outline, color: Colors.red),
-                              onPressed: () => _confirmDelete(grant.id),
-                              style: IconButton.styleFrom(
-                                backgroundColor: Colors.white,
-                              ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8, right: 8),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                TextButton.icon(
+                                  onPressed: () => _confirmDelete(grant.id),
+                                  icon: const Icon(Icons.delete_outline_rounded, size: 16),
+                                  label: const Text('Remove submission', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: Colors.redAccent,
+                                    visualDensity: VisualDensity.compact,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                       ],

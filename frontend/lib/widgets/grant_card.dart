@@ -17,196 +17,201 @@ class GrantCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap ?? () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const GrantDetailScreen(),
-            settings: RouteSettings(arguments: grant),
+    final catColor = AppTheme.getCategoryColor(grant.category);
+    
+    return Container(
+      decoration: BoxDecoration(
+        color: AppTheme.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
           ),
-        );
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppTheme.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF64748B).withValues(alpha: 0.1),
-              blurRadius: 16,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap ?? () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const GrantDetailScreen(),
+                settings: RouteSettings(arguments: grant),
+              ),
+            );
+          },
+          borderRadius: BorderRadius.circular(24),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // Top Section with Category and Status
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: catColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        grant.category.toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w900,
+                          color: catColor,
+                          letterSpacing: 1.0,
+                        ),
+                      ),
+                    ),
+                    if (grant.isVerified)
+                      const Icon(Icons.verified_rounded, color: AppTheme.success, size: 22)
+                    else 
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.amber.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Text(
+                          "PENDING",
+                          style: TextStyle(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.orange,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+
+              // Title and Organizer
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                                decoration: BoxDecoration(
-                                  color: AppTheme.getCategoryColor(grant.category).withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: AppTheme.getCategoryColor(grant.category).withValues(alpha: 0.2)),
-                                ),
-                                child: Text(
-                                  grant.category.toUpperCase(),
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w800,
-                                    color: AppTheme.getCategoryColor(grant.category),
-                                    letterSpacing: 0.5,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                grant.title,
-                                style: const TextStyle(
-                                  fontSize: 19,
-                                  fontWeight: FontWeight.w800,
-                                  color: AppTheme.darkGray,
-                                  height: 1.3,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 12),
-                          child: grant.isVerified 
-                            ? Icon(
-                                Icons.verified,
-                                color: AppTheme.verified,
-                                size: 24,
-                              )
-                            : Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                decoration: BoxDecoration(
-                                  color: Colors.amber.withValues(alpha: 0.15),
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: Colors.amber.withValues(alpha: 0.5), width: 1),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const Icon(Icons.history_edu_rounded, size: 12, color: Colors.orange),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      "UNDER REVIEW",
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w900,
-                                        color: Colors.orange[800],
-                                        letterSpacing: 0.5,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                        ),
-                      ],
+                    Text(
+                      grant.title,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        color: AppTheme.darkGray,
+                        height: 1.2,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 8),
                     Row(
                       children: [
-                        _IconText(
-                          icon: Icons.calendar_today_rounded,
-                          text: grant.formattedDeadline,
-                          color: grant.hasUpcomingDeadline ? AppTheme.warning : AppTheme.mediumGray,
-                        ),
-                        const SizedBox(width: 16),
-                        _IconText(
-                          icon: Icons.location_on_rounded,
-                          text: grant.country,
-                          color: AppTheme.mediumGray,
+                        const Icon(Icons.apartment_rounded, size: 14, color: AppTheme.mediumGray),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            grant.organizer,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: AppTheme.mediumGray,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ],
                     ),
                   ],
                 ),
               ),
+
+              // Bottom Info Bar
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                decoration: const BoxDecoration(
-                  color: Color(0xFFF8FAFC),
-                  border: Border(
-                    top: BorderSide(color: Color(0xFFF1F5F9)),
-                  ),
+                margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppTheme.offWhite,
+                  borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Grant Amount',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: AppTheme.mediumGray,
-                            fontWeight: FontWeight.w600,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'AMOUNT',
+                            style: TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
+                              color: AppTheme.mediumGray,
+                              letterSpacing: 0.5,
+                            ),
                           ),
-                        ),
-                        Text(
-                          grant.amount,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w800,
-                            color: AppTheme.success,
+                          const SizedBox(height: 4),
+                          Text(
+                            grant.amount,
+                            style: const TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w900,
+                              color: AppTheme.primaryBlue,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
+                    ),
+                    Container(
+                      width: 1,
+                      height: 30,
+                      color: AppTheme.lightGray,
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'DEADLINE',
+                            style: TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
+                              color: grant.hasUpcomingDeadline ? Colors.red : AppTheme.mediumGray,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            grant.formattedDeadline,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: grant.hasUpcomingDeadline ? Colors.red : AppTheme.darkGray,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     if (showEditButton)
-                      ElevatedButton.icon(
-                        onPressed: onTap,
-                        icon: const Icon(Icons.edit_rounded, size: 16),
-                        label: const Text('Edit'),
-                        style: ElevatedButton.styleFrom(
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8),
+                        child: CircleAvatar(
+                          radius: 18,
                           backgroundColor: AppTheme.primaryBlue,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          elevation: 0,
+                          child: IconButton(
+                            icon: const Icon(Icons.edit_rounded, size: 16, color: Colors.white),
+                            onPressed: onTap,
+                            padding: EdgeInsets.zero,
+                          ),
                         ),
                       )
-                    else
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          gradient: AppTheme.primaryGradient,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppTheme.primaryBlue.withValues(alpha: 0.25),
-                              blurRadius: 8,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.arrow_forward_rounded,
-                          size: 20,
-                          color: AppTheme.white,
-                        ),
-                      ),
+                    else 
+                      const Icon(Icons.chevron_right_rounded, color: AppTheme.mediumGray),
                   ],
                 ),
               ),

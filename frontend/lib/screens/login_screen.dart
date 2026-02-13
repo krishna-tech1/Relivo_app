@@ -5,6 +5,7 @@ import 'package:refugee_app/screens/forgot_password_screen.dart';
 import 'package:refugee_app/widgets/custom_button.dart';
 import 'package:refugee_app/widgets/custom_text_field.dart';
 import 'package:refugee_app/services/auth_services.dart';
+import 'package:refugee_app/theme/app_theme.dart';
 import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -52,14 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
           setState(() {
             _isLoading = false;
           });
-
-          // Show error message
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('${e.toString().replaceAll("Exception: ", "")}'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          AppTheme.showAlert(context, e.toString());
         }
       }
     }

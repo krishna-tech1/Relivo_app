@@ -65,9 +65,9 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _filteredGrants = _allGrants.where((grant) {
         final matchesCategory = _selectedCategory == 'All Categories' || 
-                              grant.category == _selectedCategory;
+                              grant.category.trim().toLowerCase() == _selectedCategory.trim().toLowerCase();
         final matchesCountry = _selectedCountry == 'All Countries' || 
-                             grant.country == _selectedCountry;
+                             grant.country.trim().toLowerCase() == _selectedCountry.trim().toLowerCase();
         final matchesSearch = grant.title.toLowerCase().contains(searchQuery.toLowerCase()) ||
                             grant.description.toLowerCase().contains(searchQuery.toLowerCase());
         
@@ -161,89 +161,98 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               // Header Section
               Container(
-                padding: const EdgeInsets.all(AppConstants.paddingLarge),
+                padding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
                 decoration: BoxDecoration(
                   color: AppTheme.white,
+                  borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
                   boxShadow: [
                     BoxShadow(
-                      color: AppTheme.primaryBlue.withValues(alpha: 0.08),
-                      blurRadius: 20,
-                      offset: const Offset(0, 4),
+                      color: Colors.black.withOpacity(0.03),
+                      blurRadius: 30,
+                      offset: const Offset(0, 10),
                     ),
                   ],
-                  borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),
                 ),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                     Row(
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Find Support',
-                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                color: AppTheme.mediumGray,
-                                fontWeight: FontWeight.w500,
+                              'REFUGIEE CARE',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w900,
+                                color: AppTheme.primaryBlue,
+                                letterSpacing: 2.0,
                               ),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               'Available Grants',
-                              style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                              style: TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.w900,
                                 color: AppTheme.darkGray,
-                                fontWeight: FontWeight.w800,
-                                fontSize: 26,
+                                height: 1.1,
                               ),
                             ),
                           ],
                         ),
-                        // Profile Menu
-                        PopupMenuButton<String>(
-                          onSelected: (value) {
-                            if (value == 'logout') {
-                              _handleLogout();
-                            } else if (value == 'my_submissions') {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => const MyGrantsScreen()),
-                              );
-                            }
-                          },
-                          itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                            const PopupMenuItem<String>(
-                              value: 'my_submissions',
-                              child: Row(
-                                children: [
-                                  Icon(Icons.assignment_ind, color: AppTheme.primaryColor),
-                                  SizedBox(width: 8),
-                                  Text('My Submissions'),
-                                ],
+                        // Enhanced Profile Button
+                        Material(
+                          color: Colors.transparent,
+                          child: PopupMenuButton<String>(
+                            onSelected: (value) {
+                              if (value == 'logout') {
+                                _handleLogout();
+                              } else if (value == 'my_submissions') {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const MyGrantsScreen()),
+                                );
+                              }
+                            },
+                            offset: const Offset(0, 50),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                              PopupMenuItem<String>(
+                                value: 'my_submissions',
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.assignment_ind_rounded, size: 20, color: AppTheme.primaryBlue),
+                                    const SizedBox(width: 12),
+                                    const Text('My Submissions', style: TextStyle(fontWeight: FontWeight.w600)),
+                                  ],
+                                ),
                               ),
-                            ),
-                            const PopupMenuDivider(),
-                            const PopupMenuItem<String>(
-                              value: 'logout',
-                              child: Row(
-                                children: [
-                                  Icon(Icons.logout, color: Colors.red),
-                                  SizedBox(width: 8),
-                                  Text('Logout', style: TextStyle(color: Colors.red)),
-                                ],
+                              const PopupMenuDivider(),
+                              const PopupMenuItem<String>(
+                                value: 'logout',
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.logout_rounded, size: 20, color: Colors.redAccent),
+                                    const SizedBox(width: 12),
+                                    const Text('Logout', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.w600)),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
-                          child: Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: AppTheme.primaryColor.withValues(alpha: 0.1),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.person,
-                              color: AppTheme.primaryColor,
-                              size: 24,
+                            ],
+                            child: Container(
+                              height: 48,
+                              width: 48,
+                              decoration: BoxDecoration(
+                                color: AppTheme.offWhite,
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(color: AppTheme.lightGray, width: 1.5),
+                              ),
+                              child: const Center(
+                                child: Icon(Icons.person_outline_rounded, color: AppTheme.darkGray, size: 24),
+                              ),
                             ),
                           ),
                         ),
@@ -255,23 +264,56 @@ class _HomeScreenState extends State<HomeScreen> {
                     Row(
                       children: [
                         Expanded(
-                          child: Container(
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
                             decoration: BoxDecoration(
                               color: AppTheme.offWhite,
                               borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: AppTheme.lightGray),
+                              border: Border.all(
+                                color: _searchController.text.isNotEmpty 
+                                  ? AppTheme.primaryBlue.withOpacity(0.5) 
+                                  : AppTheme.lightGray,
+                                width: 1.5,
+                              ),
+                              boxShadow: _searchController.text.isNotEmpty ? [
+                                BoxShadow(
+                                  color: AppTheme.primaryBlue.withOpacity(0.05),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                )
+                              ] : [],
                             ),
                             child: TextField(
                               controller: _searchController,
-                              onChanged: _handleSearch,
-                              style: const TextStyle(fontWeight: FontWeight.w500),
-                              decoration: const InputDecoration(
+                              textInputAction: TextInputAction.search,
+                              onSubmitted: (value) {
+                                _handleSearch(value);
+                                FocusScope.of(context).unfocus();
+                              },
+                              onChanged: (value) {
+                                setState(() {}); // Update to show/hide clear button
+                                _handleSearch(value);
+                              },
+                              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+                              decoration: InputDecoration(
                                 hintText: 'Search grants...',
-                                prefixIcon: Icon(Icons.search_rounded, color: AppTheme.mediumGray),
+                                hintStyle: TextStyle(color: AppTheme.mediumGray.withOpacity(0.6)),
+                                prefixIcon: const Icon(Icons.search_rounded, color: AppTheme.mediumGray),
+                                suffixIcon: _searchController.text.isNotEmpty
+                                  ? IconButton(
+                                      icon: const Icon(Icons.cancel_rounded, color: AppTheme.mediumGray, size: 20),
+                                      onPressed: () {
+                                        _searchController.clear();
+                                        setState(() {});
+                                        _handleSearch('');
+                                        FocusScope.of(context).unfocus();
+                                      },
+                                    )
+                                  : null,
                                 border: InputBorder.none,
                                 enabledBorder: InputBorder.none,
                                 focusedBorder: InputBorder.none,
-                                contentPadding: EdgeInsets.symmetric(
+                                contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 16, 
                                   vertical: 14,
                                 ),
@@ -289,7 +331,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppTheme.primaryBlue.withValues(alpha: 0.3),
+                                  color: AppTheme.primaryBlue.withOpacity(0.3),
                                   blurRadius: 12,
                                   offset: const Offset(0, 6),
                                 ),
@@ -334,15 +376,15 @@ class _HomeScreenState extends State<HomeScreen> {
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
-                            color: isSelected ? catColor : catColor.withValues(alpha: 0.1),
+                            color: isSelected ? catColor : catColor.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
-                              color: isSelected ? catColor : catColor.withValues(alpha: 0.2),
+                              color: isSelected ? catColor : catColor.withOpacity(0.2),
                               width: 1.5,
                             ),
                             boxShadow: isSelected ? [
                               BoxShadow(
-                                color: catColor.withValues(alpha: 0.3),
+                                color: catColor.withOpacity(0.3),
                                 blurRadius: 8,
                                 offset: const Offset(0, 4),
                               )
@@ -409,8 +451,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     ? LayoutBuilder(
                         builder: (context, constraints) => SingleChildScrollView(
                           physics: const AlwaysScrollableScrollPhysics(),
-                          child: SizedBox(
-                            height: constraints.maxHeight,
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(minHeight: constraints.maxHeight),
                             child: Center(
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -423,24 +465,26 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                     child: Icon(
                                       Icons.search_off_rounded,
-                                      size: 64,
-                                      color: AppTheme.mediumGray.withValues(alpha: 0.5),
+                                      size: 80, // Slightly larger icon
+                                      color: AppTheme.mediumGray.withOpacity(0.3),
                                     ),
                                   ),
                                   const SizedBox(height: 16),
                                   Text(
                                     'No grants found',
                                     style: TextStyle(
-                                      fontSize: 18,
-                                      color: AppTheme.mediumGray,
-                                      fontWeight: FontWeight.w600,
+                                      fontSize: 20,
+                                      color: AppTheme.darkGray,
+                                      fontWeight: FontWeight.w700,
                                     ),
                                   ),
+                                  const SizedBox(height: 8),
                                   Text(
-                                    'Try adjusting your filters',
+                                    'Try adjusting your search or filters',
+                                    textAlign: TextAlign.center,
                                     style: TextStyle(
-                                      fontSize: 14,
-                                      color: AppTheme.mediumGray.withValues(alpha: 0.7),
+                                      fontSize: 15,
+                                      color: AppTheme.mediumGray,
                                     ),
                                   ),
                                 ],
@@ -494,10 +538,10 @@ class _FilterBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppTheme.primaryBlue.withValues(alpha: 0.3)),
+        border: Border.all(color: AppTheme.primaryBlue.withOpacity(0.3)),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.primaryBlue.withValues(alpha: 0.05),
+            color: AppTheme.primaryBlue.withOpacity(0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),

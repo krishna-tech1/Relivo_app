@@ -11,213 +11,228 @@ class GrantDetailScreen extends StatelessWidget {
     final grant = ModalRoute.of(context)!.settings.arguments as Grant;
 
     return Scaffold(
-      backgroundColor: AppTheme.offWhite,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Header
-            Container(
-              decoration: BoxDecoration(
-                gradient: AppTheme.primaryGradient,
-                boxShadow: [
-                  BoxShadow(
-                    color: AppTheme.primaryBlue.withValues(alpha: 0.2),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              padding: const EdgeInsets.all(AppConstants.paddingMedium),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(
-                      Icons.arrow_back,
-                      color: AppTheme.white,
-                    ),
-                  ),
-                  const Text(
-                    'Grant Details',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.white,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            
-            // Content
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(AppConstants.paddingMedium),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Main Info Card
-                    Container(
-                      decoration: AppTheme.cardDecoration,
-                      padding: const EdgeInsets.all(AppConstants.paddingLarge),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Badges Row
-                          Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
-                            children: [
-                              _Badge(
-                                label: grant.category,
-                                color: AppTheme.getCategoryColor(grant.category),
-                              ),
-                              if (grant.isVerified)
-                                _Badge(
-                                  label: 'VERIFIED',
-                                  icon: Icons.verified,
-                                  color: AppTheme.verified,
-                                  outlined: true,
-                                ),
-                              if (grant.hasUpcomingDeadline)
-                                _Badge(
-                                  label: 'URGENT',
-                                  icon: Icons.access_time,
-                                  color: AppTheme.warning,
-                                  outlined: true,
-                                ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-                          
-                          // Title
-                          Text(
-                            grant.title,
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: AppTheme.darkGray,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          
-                          // Amount
-                          Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: AppTheme.success.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
-                              border: Border.all(color: AppTheme.success),
-                            ),
-                            child: Text(
-                              grant.amount,
-                              style: const TextStyle(
-                                fontSize: 28,
-                                fontWeight: FontWeight.bold,
-                                color: AppTheme.success,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          
-                          // Metadata
-                          _InfoRow(
-                            icon: Icons.business,
-                            label: 'Organizer',
-                            value: grant.organizer,
-                          ),
-                          const SizedBox(height: 12),
-                          _InfoRow(
-                            icon: Icons.location_on,
-                            label: 'Country',
-                            value: grant.country,
-                          ),
-                          const SizedBox(height: 12),
-                          _InfoRow(
-                            icon: Icons.calendar_today,
-                            label: 'Deadline',
-                            value: grant.formattedDeadline,
-                            valueColor: grant.hasUpcomingDeadline 
-                                ? AppTheme.warning 
-                                : null,
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: AppConstants.paddingMedium),
-                    
-                    // Description Card
-                    _SectionCard(
-                      title: 'Description',
-                      icon: Icons.description,
-                      child: Text(
-                        grant.description,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          height: 1.6,
-                          color: AppTheme.darkGray,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: AppConstants.paddingMedium),
-                    
-                    // Eligibility Criteria Card
-                    _SectionCard(
-                      title: 'Eligibility Criteria',
-                      icon: Icons.check_circle_outline,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: grant.eligibilityCriteria.map((criteria) {
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Icon(
-                                  Icons.check_circle,
-                                  color: AppTheme.success,
-                                  size: 20,
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Text(
-                                    criteria,
-                                    style: const TextStyle(
-                                      fontSize: 15,
-                                      height: 1.5,
-                                      color: AppTheme.darkGray,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-
-                    const SizedBox(height: 80), // Space for floating button
-                  ],
+      backgroundColor: AppTheme.white,
+      body: CustomScrollView(
+        slivers: [
+          // Elegant Sliver App Bar
+          SliverAppBar(
+            expandedHeight: 120,
+            floating: false,
+            pinned: true,
+            elevation: 0,
+            backgroundColor: AppTheme.white,
+            surfaceTintColor: AppTheme.white,
+            leading: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: CircleAvatar(
+                backgroundColor: AppTheme.offWhite,
+                child: IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppTheme.darkGray, size: 18),
                 ),
               ),
             ),
-          ],
-        ),
+            flexibleSpace: FlexibleSpaceBar(
+              centerTitle: true,
+              title: Text(
+                'Grant Details',
+                style: TextStyle(
+                  color: AppTheme.darkGray,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 18,
+                ),
+              ),
+              background: Container(color: AppTheme.white),
+            ),
+          ),
+
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Category and Verify Badge
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: AppTheme.getCategoryColor(grant.category).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          grant.category.toUpperCase(),
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w900,
+                            color: AppTheme.getCategoryColor(grant.category),
+                            letterSpacing: 1.0,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      if (grant.isVerified)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: AppTheme.success.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.verified_rounded, size: 14, color: AppTheme.success),
+                              const SizedBox(width: 4),
+                              const Text(
+                                'VERIFIED',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w900,
+                                  color: AppTheme.success,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  // Grant Title
+                  Text(
+                    grant.title,
+                    style: const TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w900,
+                      color: AppTheme.darkGray,
+                      height: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Key Info Grid
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: AppTheme.offWhite,
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    child: Column(
+                      children: [
+                        _InfoRow(
+                          icon: Icons.monetization_on_rounded,
+                          label: 'GRANT AMOUNT',
+                          value: grant.amount,
+                          valueColor: AppTheme.primaryBlue,
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          child: Divider(color: AppTheme.lightGray, height: 1),
+                        ),
+                        _InfoRow(
+                          icon: Icons.calendar_today_rounded,
+                          label: 'APPLICATION DEADLINE',
+                          value: grant.formattedDeadline,
+                          valueColor: grant.hasUpcomingDeadline ? Colors.red : null,
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          child: Divider(color: AppTheme.lightGray, height: 1),
+                        ),
+                        _InfoRow(
+                          icon: Icons.apartment_rounded,
+                          label: 'ORGANIZATION',
+                          value: grant.organizer,
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          child: Divider(color: AppTheme.lightGray, height: 1),
+                        ),
+                        _InfoRow(
+                          icon: Icons.public_rounded,
+                          label: 'COUNTRY',
+                          value: grant.country,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+
+                    
+                  // Description Card
+                  _SectionCard(
+                    title: 'Description',
+                    icon: Icons.description_rounded,
+                    child: Text(
+                      grant.description,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        height: 1.6,
+                        color: AppTheme.darkGray,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  
+                  // Eligibility Criteria Card
+                  _SectionCard(
+                    title: 'Eligibility Criteria',
+                    icon: Icons.check_circle_outline_rounded,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: grant.eligibilityCriteria.map((criteria) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.only(top: 4),
+                                child: Icon(
+                                  Icons.check_circle_rounded,
+                                  color: AppTheme.success,
+                                  size: 18,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  criteria,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    height: 1.5,
+                                    color: AppTheme.darkGray,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+
+                  const SizedBox(height: 120), // Bottom padding for FAB
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
       
       // Floating Apply Button
       floatingActionButton: Container(
         width: double.infinity,
-        margin: const EdgeInsets.symmetric(horizontal: AppConstants.paddingMedium),
-        height: AppConstants.buttonHeight,
+        margin: const EdgeInsets.symmetric(horizontal: 24),
+        height: 60,
         decoration: BoxDecoration(
           gradient: AppTheme.primaryGradient,
-          borderRadius: BorderRadius.circular(AppConstants.borderRadiusLarge),
+          borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: AppTheme.primaryBlue.withValues(alpha: 0.4),
-              blurRadius: 16,
-              offset: const Offset(0, 8),
+              color: AppTheme.primaryBlue.withOpacity(0.3),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
             ),
           ],
         ),
@@ -234,15 +249,11 @@ class GrantDetailScreen extends StatelessWidget {
             }
             
             try {
-              // Fix URL if it doesn't have http:// or https://
               String fixedUrl = grant.applyUrl;
               if (!fixedUrl.startsWith('http://') && !fixedUrl.startsWith('https://')) {
                 fixedUrl = 'https://$fixedUrl';
               }
-              
               final Uri url = Uri.parse(fixedUrl);
-              
-              // Check if URL can be launched
               final canLaunch = await canLaunchUrl(url);
               
               if (!canLaunch) {
@@ -251,44 +262,19 @@ class GrantDetailScreen extends StatelessWidget {
                     SnackBar(
                       content: Text('Cannot open this URL: $fixedUrl'),
                       backgroundColor: AppTheme.error,
-                      duration: const Duration(seconds: 4),
                     ),
                   );
                 }
                 return;
               }
               
-              // Try to launch in external browser first
-              bool launched = await launchUrl(
-                url, 
-                mode: LaunchMode.externalApplication,
-              );
-              
-              // If external launch fails, try in-app browser
-              if (!launched) {
-                launched = await launchUrl(
-                  url,
-                  mode: LaunchMode.platformDefault,
-                );
-              }
-              
-              // If both fail, show error
-              if (!launched && context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Could not open application link'),
-                    backgroundColor: AppTheme.error,
-                    duration: Duration(seconds: 4),
-                  ),
-                );
-              }
+              await launchUrl(url, mode: LaunchMode.externalApplication);
             } catch (e) {
                if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('Error: $e'),
                       backgroundColor: AppTheme.error,
-                      duration: const Duration(seconds: 5),
                     ),
                   );
                }
@@ -298,72 +284,20 @@ class GrantDetailScreen extends StatelessWidget {
             backgroundColor: Colors.transparent,
             shadowColor: Colors.transparent,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppConstants.borderRadiusLarge),
+              borderRadius: BorderRadius.circular(20),
             ),
           ),
           child: const Text(
             'Apply Now',
             style: TextStyle(
               fontSize: 18,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w900,
               color: AppTheme.white,
             ),
           ),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-    );
-  }
-}
-
-class _Badge extends StatelessWidget {
-  final String label;
-  final IconData? icon;
-  final Color? color;
-  final Gradient? gradient;
-  final bool outlined;
-
-  const _Badge({
-    required this.label,
-    this.icon,
-    this.color,
-    this.gradient,
-    this.outlined = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        gradient: outlined ? null : gradient,
-        color: outlined 
-            ? color?.withValues(alpha: 0.1) 
-            : (gradient == null ? color : null),
-        borderRadius: BorderRadius.circular(AppConstants.borderRadiusSmall),
-        border: outlined ? Border.all(color: color!) : null,
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (icon != null) ...[
-            Icon(
-              icon,
-              size: 14,
-              color: outlined ? color : AppTheme.white,
-            ),
-            const SizedBox(width: 4),
-          ],
-          Text(
-            label,
-            style: TextStyle(
-              color: outlined ? color : AppTheme.white,
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -385,30 +319,36 @@ class _InfoRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(
-          icon,
-          size: 20,
-          color: AppTheme.primaryBlue,
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: AppTheme.white,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(icon, size: 20, color: AppTheme.primaryBlue),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: 16),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: AppTheme.mediumGray,
-                ),
-              ),
               const SizedBox(height: 2),
               Text(
                 value,
                 style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
                   color: valueColor ?? AppTheme.darkGray,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.mediumGray,
+                  letterSpacing: 0.5,
                 ),
               ),
             ],
@@ -432,34 +372,26 @@ class _SectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: AppTheme.cardDecoration,
-      padding: const EdgeInsets.all(AppConstants.paddingLarge),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                icon,
-                color: AppTheme.primaryBlue,
-                size: 24,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(icon, color: AppTheme.darkGray, size: 22),
+            const SizedBox(width: 10),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w900,
+                color: AppTheme.darkGray,
               ),
-              const SizedBox(width: 12),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppTheme.darkGray,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          child,
-        ],
-      ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        child,
+      ],
     );
   }
 }

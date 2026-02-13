@@ -52,7 +52,7 @@ class _FilterScreenState extends State<FilterScreen> {
                 gradient: AppTheme.primaryGradient,
                 boxShadow: [
                   BoxShadow(
-                    color: AppTheme.primaryBlue.withValues(alpha: 0.2),
+                    color: AppTheme.primaryBlue.withOpacity(0.2),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -202,7 +202,7 @@ class _FilterScreenState extends State<FilterScreen> {
                 color: AppTheme.white,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
+                    color: Colors.black.withOpacity(0.05),
                     blurRadius: 8,
                     offset: const Offset(0, -2),
                   ),
@@ -215,7 +215,7 @@ class _FilterScreenState extends State<FilterScreen> {
                   borderRadius: BorderRadius.circular(AppConstants.borderRadiusLarge),
                   boxShadow: [
                     BoxShadow(
-                      color: AppTheme.primaryBlue.withValues(alpha: 0.3),
+                      color: AppTheme.primaryBlue.withOpacity(0.3),
                       blurRadius: 12,
                       offset: const Offset(0, 6),
                     ),
@@ -278,7 +278,7 @@ class _FilterChip extends StatelessWidget {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: AppTheme.primaryBlue.withValues(alpha: 0.3),
+                    color: AppTheme.primaryBlue.withOpacity(0.3),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),

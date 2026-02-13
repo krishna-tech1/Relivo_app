@@ -4,6 +4,7 @@ import 'package:refugee_app/screens/login_screen.dart';
 import 'package:refugee_app/widgets/custom_button.dart';
 import 'package:refugee_app/widgets/custom_text_field.dart';
 import 'package:refugee_app/services/auth_services.dart';
+import 'package:refugee_app/theme/app_theme.dart';
 import 'verify_email_screen.dart';
 import 'landing_screen.dart';
 
@@ -43,12 +44,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           });
 
           // Show success message
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Registration successful! Please verify your email.'),
-              backgroundColor: Colors.green,
-            ),
-          );
+          AppTheme.showSuccess(context, 'Registration successful! Please verify your email.');
 
           // Navigate to verify email screen
           Navigator.pushReplacement(
@@ -65,14 +61,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           setState(() {
             _isLoading = false;
           });
-
-          // Show error message
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('${e.toString().replaceAll("Exception: ", "")}'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          AppTheme.showAlert(context, e.toString());
         }
       }
     }
